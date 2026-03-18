@@ -171,17 +171,11 @@ const SplashT = [
   "This is dedicated for Homeroom 222 of the Frank R. Conwell Middle School 4",
   "Made by Sharvesh Vijayanand (SpyderSammy)",
   "Check out my new Interstellar Proxy! :)",
-  "These notifications will have further updates such as new url's, proxy websites, and more!",
   "Interstellar is a high-speed proxy designed to bypass school filters.",
   "All hail SpyderSammy",
-  "Tung Tung Tung Sahur",
   "Check out the settings page",
   "Don't forget to play admin abuse this week!"
-  "Have a nice day"
-  "Contact 208419@jcpsnj.org for updates, requests, errors and new url's"
-  "The games are op"
-  "The power of code"
-  "Sharvesh Vijayanand (AKA SpyderSammy),
+  "Contact 208419@jcpsnj.org for updates, requests, errors and new url's",
 ];
 
 let SplashI = Math.floor(Math.random() * SplashT.length);
