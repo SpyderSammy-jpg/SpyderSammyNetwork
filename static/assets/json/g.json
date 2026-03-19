@@ -6,17 +6,18 @@
     "custom": "true"
   },
   {
-    "name": "! Interstellar FAQ/Docs",
-    "image": "/assets/media/icons/help_center_googlefonts.png",
-    "link": "https://docs.gointerstellar.app",
+    "name": "! More Games",
+    "link": , "https://smartpepoleonly.tvcana.com.br/docs/r/",
+    "image": "/assets/media/icons/custom.webp",
     "categories": ["all"]
   },
   {
-    "name": "! [NEW] Request A Game",
-    "link": "https://forms.gle/vwdHN3iPz5cLaHaMA",
-    "image": "/assets/media/icons/request.webp",
+    "name": "! Roblox",
+    "link": , "https://69.ip.nowgg.fun/apps/a/19900/b.html",
+    "image": "/assets/media/icons/custom.webp",
     "categories": ["all"]
   },
+ 
   {
     "name": "Fancade",
     "link": "https://play.fancade.com",
