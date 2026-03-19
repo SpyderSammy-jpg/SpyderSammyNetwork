@@ -176,8 +176,8 @@ const SplashT = [
   "All hail SpyderSammy",
   "Check out the settings page",
   "Don't forget to play admin abuse this week!",
-  "Contact 208419@jcpsnj.org for updates, requests, errors and new url's"
-  "Tung Tung Tung Sahur!"
+  "Contact 208419@jcpsnj.org for updates, requests, errors and new url's",
+  "Tung Tung Tung Sahur!",
   "Announcement: Mohanesh's favorite word is: TESTICLES!",
 ];
 
