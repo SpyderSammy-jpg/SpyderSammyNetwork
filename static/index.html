@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
   
   <style>
-    /* 1. Force Background to Black */
+    /* 1. Make background completely black and remove any gradients */
     body, html, #particles-js {
       background: #000 !important;
       background-color: #000 !important;
@@ -31,17 +31,14 @@
       -webkit-text-fill-color: initial !important;
     }
 
-    /* 3. WIPE THE "IN" LOGO COMPLETELY */
-    .f-nav, .f-nav *, .f-nav::before, .f-nav::after {
-      background-image: none !important;
-      background: none !important;
-      content: none !important;
-      display: none !important; /* This hides the entire top-left logo container */
+    /* 3. Completely remove the top-left corner logo/branding */
+    .f-nav {
+      background: transparent !important;
+      border: none !important;
     }
-
-    /* Keep the main content area visible even if nav is hidden */
-    .main {
-      z-index: 10;
+    .f-nav::before, .f-nav::after, .f-nav * {
+      background-image: none !important;
+      content: none !important; /* Kills any generated content logos */
     }
   </style>
 
@@ -50,7 +47,7 @@
 </head>
 
 <body class="center" onload="SplashT">
-  <div class="f-nav"></div> <!-- This is the container for the "IN" logo -->
+  <div class="f-nav"></div>
   <div id="particles-js">
     <script rel="preload" src="https://cdn.jsdelivr.net"></script>
     <div class="main">
@@ -80,3 +77,4 @@
 </body>
 
 </html>
+
