@@ -1,12 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" id="tab-favicon" href="https://ssl.gstatic.com" />
+  <title id="t">Home - Classroom</title>
+  <link rel="stylesheet" href="/assets/css/global.css?v=6" />
+  <link rel="stylesheet" href="/assets/css/h.css?v=01" />
+  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
+  
   <style>
-    /* 1. Make background completely black */
+    /* 1. Force Background to Black */
     body, html, #particles-js {
       background: #000 !important;
       background-color: #000 !important;
       background-image: none !important;
     }
 
-    /* 2. Red/Yellow Font Styling for SpyderSammy */
+    /* 2. Red/Yellow Font Styling */
     .title {
       color: #ff0000 !important;
       -webkit-text-stroke: 1.5px #ffff00;
@@ -16,21 +31,52 @@
       -webkit-text-fill-color: initial !important;
     }
 
-    /* 3. ONLY REMOVE THE "IN" LOGO (NOT THE NAVBAR) */
-    /* This kills the 'IN' icon specifically if it's a background image */
-    .f-nav {
+    /* 3. WIPE THE "IN" LOGO COMPLETELY */
+    .f-nav, .f-nav *, .f-nav::before, .f-nav::after {
       background-image: none !important;
-    }
-    
-    /* This kills the 'IN' icon if it's a 'before' or 'after' element */
-    .f-nav::before, .f-nav::after {
+      background: none !important;
       content: none !important;
-      display: none !important;
-      background-image: none !important;
+      display: none !important; /* This hides the entire top-left logo container */
     }
 
-    /* This ensures the rest of the navbar links (Games, Apps, etc.) stay visible */
-    .f-nav * {
-      display: inline-block; /* or 'flex' depending on your specific version */
+    /* Keep the main content area visible even if nav is hidden */
+    .main {
+      z-index: 10;
     }
   </style>
+
+  <script async src="https://pagead2.googlesyndication.com"
+    crossorigin="anonymous"></script>
+</head>
+
+<body class="center" onload="SplashT">
+  <div class="f-nav"></div> <!-- This is the container for the "IN" logo -->
+  <div id="particles-js">
+    <script rel="preload" src="https://cdn.jsdelivr.net"></script>
+    <div class="main">
+      <h1 class="title">SpyderSammy</h1>
+      <p id="splash"></p>
+      <div class="search-container">
+        <form id="fv" method="POST">
+          <input id="input" class="truncate" placeholder="Search or enter a URL" type="text" />
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/index-3.js"></script>
+  <script src="/assets/js/h1.js"></script>
+  <script src="./assets/mathematics/bundle.js?v=2025-04-15"></script>
+  <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
+  <script src="/assets/js/m1.js"></script>
+
+  <!-- Google Analytics Tracking -->
+  <script async src="https://www.googletagmanager.com"></script>
+  <script>
+    window.dataLayer = window.dataLayer || []
+    function gtag() { dataLayer.push(arguments) }
+    gtag("js", new Date())
+    gtag("config", "G-WKJQ5QHQTJ")
+  </script>
+</body>
+
+</html>
