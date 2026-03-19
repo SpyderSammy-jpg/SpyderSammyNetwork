@@ -1,8 +1,5 @@
-<head>
-  <!-- ... [Keep your other meta and link tags here] ... -->
-  
   <style>
-    /* 1. Make the background pitch black */
+    /* 1. Make background completely black */
     body, html, #particles-js {
       background: #000 !important;
       background-color: #000 !important;
@@ -19,37 +16,21 @@
       -webkit-text-fill-color: initial !important;
     }
 
-    /* 3. REMOVE ONLY THE LOGO (KEEP THE NAV TABS) */
-    /* This targets the logo's background image specifically */
+    /* 3. ONLY REMOVE THE "IN" LOGO (NOT THE NAVBAR) */
+    /* This kills the 'IN' icon specifically if it's a background image */
     .f-nav {
-      background-image: none !important; 
-    }
-    /* This removes the "IN" icon if it's a separate link/image in the corner */
-    .f-nav a:first-child img, 
-    .f-nav .logo, 
-    .f-nav::before {
-      display: none !important;
-      content: none !important;
       background-image: none !important;
     }
-  </style>
-</head>
+    
+    /* This kills the 'IN' icon if it's a 'before' or 'after' element */
+    .f-nav::before, .f-nav::after {
+      content: none !important;
+      display: none !important;
+      background-image: none !important;
+    }
 
-<body class="center" onload="SplashT">
-  <!-- The navbar remains, but the logo inside it is now hidden -->
-  <div class="f-nav"></div> 
-  
-  <div id="particles-js">
-    <script rel="preload" src="https://cdn.jsdelivr.net"></script>
-    <div class="main">
-      <h1 class="title">SpyderSammy</h1>
-      <p id="splash"></p>
-      <div class="search-container">
-        <form id="fv" method="POST">
-          <input id="input" class="truncate" placeholder="Search or enter a URL" type="text" />
-        </form>
-      </div>
-    </div>
-  </div>
-  <!-- ... [Keep your scripts below] ... -->
-</body>
+    /* This ensures the rest of the navbar links (Games, Apps, etc.) stay visible */
+    .f-nav * {
+      display: inline-block; /* or 'flex' depending on your specific version */
+    }
+  </style>
