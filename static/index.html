@@ -11,10 +11,11 @@
   <link rel="stylesheet" href="/assets/css/global.css?v=6" />
   <link rel="stylesheet" href="/assets/css/h.css?v=01" />
   <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com">
   
   <style>
-    /* 1. Background and removal of previous logo styles */
-    body, html, #particles-js {
+    /* 1. Force background to black for this and all sub-pages */
+    html, body, #particles-js, .main, .center {
       background: #000 !important;
       background-color: #000 !important;
       background-image: none !important;
@@ -25,57 +26,33 @@
       color: #ff0000 !important;
       -webkit-text-stroke: 1.5px #ffff00;
       font-weight: 900;
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      -webkit-text-fill-color: initial !important;
     }
 
-    /* 3. Updated Navbar Styles for Spider Logo */
-    .f-nav {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      background: rgba(0,0,0,0.8) !important;
-      border-bottom: 1px solid #333;
+    /* 3. Hide the logo specifically within the navbar */
+    /* If your navbar uses .f-nav as the logo container: */
+    .f-nav { 
+      display: none !important; 
     }
 
-    /* Target the container that held the old IN logo */
-    .f-nav .logo-container {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
-    }
-
-    .spider-home-btn {
-      width: 35px;
-      cursor: pointer;
-      filter: drop-shadow(0 0 5px red);
-      transition: transform 0.2s;
-    }
-
-    .spider-home-btn:hover {
-      transform: scale(1.1);
+    /* Ensure the actual navigation links stay visible if they are in a different container */
+    nav, .navbar, .nav-container {
+      background: #000 !important;
     }
   </style>
+
+  <script async src="https://pagead2.googlesyndication.com"
+    crossorigin="anonymous"></script>
 </head>
 
 <body class="center" onload="SplashT">
-  <!-- THE NAVBAR -->
-  <div class="f-nav">
-    <div class="logo-container">
-      <!-- Replace the old IN logo with this Spider Logo Button -->
-      <a href="/">
-        <img src="https://img.icons8.com" class="spider-home-btn" alt="Home">
-      </a>
-    </div>
-
-    <!-- Renamed Nav Items -->
-    <div class="nav-items">
-      <!-- Use your original hrefs/functions here to keep them working -->
-      <a href="/games.html" class="nav-link">Games</a>
-      <a href="/browser.html" class="nav-link">Browser</a> <!-- Renamed from Tabs -->
-      <a href="/settings.html" class="nav-link">Settings</a> <!-- Renamed from Setting -->
-    </div>
-  </div>
+  <!-- This is the element being hidden by the CSS above -->
+  <div class="f-nav"></div>
 
   <div id="particles-js">
+    <script rel="preload" src="https://cdn.jsdelivr.net"></script>
     <div class="main">
       <h1 class="title">SpyderSammy</h1>
       <p id="splash"></p>
@@ -93,7 +70,7 @@
   <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
   <script src="/assets/js/m1.js"></script>
 
-  <!-- Google Analytics -->
+  <!-- Google Analytics Tracking -->
   <script async src="https://www.googletagmanager.com"></script>
   <script>
     window.dataLayer = window.dataLayer || []
