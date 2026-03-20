@@ -8,72 +8,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" id="tab-favicon" href="https://ssl.gstatic.com" />
   <title id="t">Home - Classroom</title>
+  
+  <!-- CSS Links -->
   <link rel="stylesheet" href="/assets/css/global.css?v=6" />
   <link rel="stylesheet" href="/assets/css/h.css?v=01" />
-  <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
   
   <style>
-    /* 1. Background and removal of previous logo styles */
+    /* 1. Reset & Global Background */
     body, html, #particles-js {
       background: #000 !important;
-      background-color: #000 !important;
-      background-image: none !important;
+      margin: 0;
+      padding: 0;
     }
 
-    /* 2. Red/Yellow Font Styling */
+    /* 2. Manual Navbar (Replacing the old f-nav) */
+    .custom-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px 30px;
+      background: rgba(10, 10, 10, 0.95);
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      height: 60px;
+    }
+
+    .spider-logo-btn {
+      height: 40px;
+      width: 40px;
+      cursor: pointer;
+      margin-right: 30px;
+      transition: filter 0.3s ease;
+      filter: drop-shadow(0 0 2px red);
+    }
+
+    .spider-logo-btn:hover {
+      filter: drop-shadow(0 0 10px red);
+    }
+
+    .nav-links-container {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .nav-item {
+      color: #ffffff;
+      text-decoration: none;
+      font-family: sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      transition: color 0.2s;
+    }
+
+    .nav-item:hover {
+      color: #ff0000;
+    }
+
+    /* 3. Title Styling */
     .title {
       color: #ff0000 !important;
       -webkit-text-stroke: 1.5px #ffff00;
       font-weight: 900;
     }
 
-    /* 3. Updated Navbar Styles for Spider Logo */
-    .f-nav {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      background: rgba(0,0,0,0.8) !important;
-      border-bottom: 1px solid #333;
-    }
-
-    /* Target the container that held the old IN logo */
-    .f-nav .logo-container {
-      display: flex;
-      align-items: center;
-      margin-right: 20px;
-    }
-
-    .spider-home-btn {
-      width: 35px;
-      cursor: pointer;
-      filter: drop-shadow(0 0 5px red);
-      transition: transform 0.2s;
-    }
-
-    .spider-home-btn:hover {
-      transform: scale(1.1);
-    }
+    /* Hide any old f-nav styling that might interfere */
+    .f-nav { display: none !important; }
   </style>
 </head>
 
 <body class="center" onload="SplashT">
-  <!-- THE NAVBAR -->
-  <div class="f-nav">
-    <div class="logo-container">
-      <!-- Replace the old IN logo with this Spider Logo Button -->
-      <a href="/">
-        <img src="https://img.icons8.com" class="spider-home-btn" alt="Home">
-      </a>
-    </div>
+  
+  <!-- NEW REPLACEMENT NAVBAR -->
+  <nav class="custom-navbar">
+    <!-- Spider Logo Button (Brings you home) -->
+    <a href="/">
+      <img src="https://img.icons8.com" class="spider-logo-btn" alt="Spider Logo">
+    </a>
 
-    <!-- Renamed Nav Items -->
-    <div class="nav-items">
-      <!-- Use your original hrefs/functions here to keep them working -->
-      <a href="/games.html" class="nav-link">Games</a>
-      <a href="/browser.html" class="nav-link">Browser</a> <!-- Renamed from Tabs -->
-      <a href="/settings.html" class="nav-link">Settings</a> <!-- Renamed from Setting -->
+    <!-- Nav Items (Preserving original links) -->
+    <div class="nav-links-container">
+      <a href="/games.html" class="nav-item">Games</a>
+      <a href="/browser.html" class="nav-item">Browser</a>  <!-- Renamed Tabs -->
+      <a href="/settings.html" class="nav-item">Settings</a> <!-- Renamed Setting -->
     </div>
-  </div>
+  </nav>
 
   <div id="particles-js">
     <div class="main">
@@ -93,7 +114,6 @@
   <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
   <script src="/assets/js/m1.js"></script>
 
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com"></script>
   <script>
     window.dataLayer = window.dataLayer || []
@@ -102,5 +122,4 @@
     gtag("config", "G-WKJQ5QHQTJ")
   </script>
 </body>
-
 </html>
