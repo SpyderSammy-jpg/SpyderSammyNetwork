@@ -114,3 +114,30 @@ html, body, #particles-js, .main, .center, .container {
   text-decoration: none;
   font-weight: bold;
 }
+/* --- SpyderSystem Global Styles --- */
+#spyder-bar {
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+    background: #000; border-top: 1px solid #333; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; font-family: sans-serif; font-size: 13px; z-index: 10000;
+}
+.bar-section { display: flex; align-items: center; gap: 15px; }
+.status-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #000; transition: 0.3s; }
+.beep-anim { animation: spyderBeep 0.5s infinite; }
+@keyframes spyderBeep { 0% { background: #ff0000; } 50% { background: #ffff00; } 100% { background: #ff0000; } }
+
+#spyder-sidebar {
+    position: fixed; right: -350px; top: 0; width: 320px; height: 100%;
+    background: #000; border-left: 2px solid #ff0000; color: #fff;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10001; padding: 20px; overflow-y: auto;
+}
+#spyder-sidebar.open { right: 0; }
+.sidebar-box { border: 1px solid #333; padding: 12px; margin-bottom: 15px; background: #050505; border-radius: 4px; }
+.red-text { color: #ff0000; font-weight: 900; text-transform: uppercase; margin: 10px 0; font-size: 14px; }
+.yellow-text { color: #ffff00; font-size: 13px; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-top: 10px; }
+.cal-day { padding: 8px; border: 1px solid #222; font-size: 11px; text-align: center; }
+.cal-today { background: #ff0000; color: #000; font-weight: bold; }
+input[type="range"] { accent-color: #ff0000; cursor: pointer; }
+.add-btn { background: #ff0000; color: #000; border: none; cursor: pointer; padding: 0 6px; font-weight: bold; }
