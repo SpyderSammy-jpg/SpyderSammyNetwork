@@ -124,26 +124,26 @@ html, body, #particles-js, .main, .center, .container {
 
 .task-left { display: flex; align-items: center; gap: 15px; }
 .task-right { 
-    display: flex; align-items: center; gap: 15px; cursor: pointer; 
-    padding: 5px 15px; border-radius: 4px; transition: 0.2s; 
-    margin-right: 10px; /* Moves icons away from the very edge */
+    display: flex; align-items: center; gap: 12px; cursor: pointer; 
+    padding: 5px 10px; border-radius: 4px; transition: 0.2s; 
+    margin-right: 15px; /* Moves bell icon left */
 }
 .task-right:hover { background: rgba(255,255,255,0.1); }
 
 /* Quick Settings Popups */
 .spyder-popup {
     position: fixed; bottom: 55px; right: 15px; width: 280px;
-    background: #000; border: 1px solid #ff0000; padding: 20px;
+    background: #000; border: 2px solid #ff0000; padding: 20px;
     border-radius: 8px; display: none; flex-direction: column; gap: 15px; z-index: 10003;
 }
 
-/* Vertical Slider (Thermometer Style) */
+/* Vertical Slider */
 .thermometer-slider {
     -webkit-appearance: slider-vertical;
-    width: 25px; height: 150px; accent-color: #ff0000; outline: none;
+    width: 25px; height: 150px; accent-color: #ff0000;
 }
 
-/* Sidebar Styling - Fixed hiding issue */
+/* Sidebar Styling - Fully hidden at -360px */
 #spyder-sidebar {
     position: fixed; right: -360px; top: 0; width: 350px; height: calc(100% - 48px);
     background: #000; border-left: 2px solid #ff0000; transition: 0.4s;
@@ -159,6 +159,4 @@ html, body, #particles-js, .main, .center, .container {
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; background: #111; padding: 10px; }
 .cal-day { text-align: center; padding: 8px; font-size: 12px; border: 1px solid #222; position: relative; }
 .cal-today { background: #ff0000; color: #000; font-weight: bold; }
-.cal-event { border-bottom: 2px solid #ffff00; } /* Marks holidays */
-
-.red-text { color: #ff0000; font-weight: bold; margin-top: 20px; display: block; }
+.cal-holiday { border-bottom: 2px solid #ffff00; } /* Marks actual holidays */
