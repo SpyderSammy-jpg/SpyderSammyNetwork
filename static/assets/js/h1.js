@@ -222,9 +222,9 @@ function randRange(min, max) {
     <div id="spyder-bar">
         <div class="left-group">
             <div class="fps-box">
-                <span id="fps-val" style="color:#ff0; font-size:10px; font-weight:bold;">0</span>
+                <span id="fps-val" style="color:#ff0; font-size:11px; font-weight:bold;">0</span>
                 <div id="fps-dot" class="status-dot"></div>
-                <span style="font-size:7px; color:#888;">ONLINE</span>
+                <span style="font-size:8px; color:#666; font-weight:bold;">LIVE</span>
             </div>
             <div class="short-bars">
                 VOL <input type="range" id="vol-slider" min="0" max="100" value="100">
@@ -232,10 +232,9 @@ function randRange(min, max) {
             </div>
         </div>
         <div class="right-group">
-            <div class="battery-group">
+            <div class="battery-group" id="batt-box" title="Checking battery...">
                 <span id="charge-icon" style="display:none;">⚡</span>
                 <div class="batt-container"><div id="batt-fill"></div></div>
-                <span id="batt-text" style="font-size:9px; color:#888;">--%</span>
             </div>
             <span id="notif-bell">🔔</span>
             <div class="time-stack">
@@ -245,44 +244,63 @@ function randRange(min, max) {
         </div>
     </div>
     <div id="spyder-sidebar">
-        <span class="close-side" id="side-x">&times;</span>
-        <h3 style="color:#f00; font-size:12px; margin-bottom:5px;">REMINDERS <button id="add-rem-btn" style="background:#f00; border:none; padding:0 5px; cursor:pointer;">+</button></h3>
-        <div id="rem-list" class="sidebar-box" style="font-size:11px;"></div>
-        <h3 style="color:#f00; font-size:12px; margin-bottom:5px;">SPYDERCALENDAR</h3>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; align-items:center;">
-            <button id="prev-mo" style="background:none; border:1px solid #333; color:#f00; cursor:pointer; padding:0 5px;">&lt;</button>
-            <span id="cal-label" style="font-weight:bold; font-size:12px;"></span>
-            <button id="next-mo" style="background:none; border:1px solid #333; color:#f00; cursor:pointer; padding:0 5px;">&gt;</button>
+        <h3 style="color:#f00; font-size:13px; letter-spacing:1px;">REMINDERS <button id="add-rem-btn" style="float:right; background:#f00; color:#000; border:none; cursor:pointer; font-weight:bold;">+</button></h3>
+        <div id="rem-list" class="sidebar-box"></div>
+        <h3 style="color:#f00; font-size:13px; letter-spacing:1px;">ACTION CENTER</h3>
+        <div id="notif-history" class="sidebar-box" style="font-size:11px; color:#ccc;">No new notifications.</div>
+        <h3 style="color:#f00; font-size:13px; letter-spacing:1px;">CALENDAR</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+            <button id="prev-mo" style="background:none; border:1px solid #333; color:#f00; cursor:pointer;">&lt;</button>
+            <span id="cal-label" style="font-size:12px; font-weight:bold;"></span>
+            <button id="next-mo" style="background:none; border:1px solid #333; color:#f00; cursor:pointer;">&gt;</button>
         </div>
         <div id="cal-box" class="sidebar-box"></div>
-        <div style="font-size:10px; color:#ffff00;">National Day: <span id="nat-day" style="color:#fff;"></span></div>
-        <div style="font-size:10px; color:#f00; margin-top:10px;">Countdown to School End:<br><span id="school-count" style="color:#fff; font-size:14px;"></span></div>
+        <div style="font-size:11px; color:#ffff00;">Events: <span id="nat-day" style="color:#fff;"></span></div>
     </div>
-    <div id="holiday-popup"></div>
     <div id="bri-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; pointer-events:none; z-index:9999; opacity:0;"></div>`;
 
     document.body.insertAdjacentHTML('beforeend', ui);
 
     let calD = new Date(), rems = JSON.parse(localStorage.getItem('spyderReminders') || '[]');
-    const holidays = { "1-1": "New Year", "3-21": "National Memory Day", "3-22": "World Water Day", "10-31": "Halloween", "12-25": "Christmas" };
+    const holidays = { "12-25": "Christmas", "1-1": "New Year", "3-21": "Memory Day", "3-22": "Water Day" };
+
+    function pushNotification(msg) {
+        // 1. Desktop Popup
+        if (Notification.permission === "granted") {
+            new Notification("SpyderSammy", { body: msg });
+        }
+        // 2. Sidebar Logging
+        const hist = document.getElementById('notif-history');
+        if (hist.innerText.includes("No new")) hist.innerHTML = "";
+        const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        hist.insertAdjacentHTML('afterbegin', `<div style="border-bottom:1px solid #222; padding:5px 0;"><b>${msg}</b><br><span style="color:#666">${time}</span></div>`);
+    }
 
     function tick() {
         const now = new Date();
         document.getElementById('bar-time').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
         document.getElementById('bar-date').innerText = now.toLocaleDateString();
+        
         const key = `${now.getMonth()+1}-${now.getDate()}`;
-        document.getElementById('nat-day').innerText = holidays[key] || "Nothing special today!";
-        const diff = new Date("2026-06-19") - now;
-        document.getElementById('school-count').innerText = Math.floor(diff/86400000) + " Days";
+        document.getElementById('nat-day').innerText = holidays[key] || "No events today.";
+
+        const curT = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        rems.forEach(r => {
+            if(r.tm === curT && !r.fired) {
+                pushNotification(`Reminder: ${r.t}`);
+                r.fired = true;
+                localStorage.setItem('spyderReminders', JSON.stringify(rems));
+            }
+        });
     }
 
     if (navigator.getBattery) navigator.getBattery().then(b => {
         const up = () => {
-            const lvl = b.level * 100;
-            document.getElementById('batt-text').innerText = Math.round(lvl) + "%";
-            const f = document.getElementById('batt-fill');
-            f.style.width = lvl + "%";
-            f.style.background = lvl < 25 ? "#f00" : (lvl < 60 ? "#ffa500" : "#0f0");
+            const lvl = Math.round(b.level * 100);
+            document.getElementById('batt-box').title = `Battery: ${lvl}% ${b.charging ? '(Charging)' : ''}`;
+            const fill = document.getElementById('batt-fill');
+            fill.style.width = lvl + "%";
+            fill.style.background = lvl < 20 ? "#f00" : (lvl < 50 ? "#ffa500" : "#0f0");
             document.getElementById('charge-icon').style.display = b.charging ? "inline" : "none";
         };
         up(); b.onlevelchange = up; b.onchargingchange = up;
@@ -294,24 +312,19 @@ function randRange(min, max) {
         const days = new Date(y, m + 1, 0).getDate();
         let h = `<div class="cal-grid">`;
         for(let i=1; i<=days; i++) {
-            const isHol = holidays[`${m+1}-${i}`];
-            const isT = i===new Date().getDate() && m===new Date().getMonth() && y===new Date().getFullYear();
-            h += `<div class="cal-day ${isT?'cal-today':''} ${isHol?'cal-holiday':''}" onmouseover="shH(event,'${isHol||''}')" onmouseout="hiH()">${i}</div>`;
+            const isH = holidays[`${m+1}-${i}`], isT = i===new Date().getDate() && m===new Date().getMonth();
+            h += `<div class="cal-day ${isT?'cal-today':''} ${isH?'cal-holiday':''}" title="${isH||''}">${i}</div>`;
         }
         document.getElementById('cal-box').innerHTML = h + '</div>';
     }
 
-    window.shH = (e, n) => { if(!n) return; const p = document.getElementById('holiday-popup'); p.innerText = n; p.style.display = 'block'; p.style.top = (e.clientY-30)+'px'; p.style.left = (e.clientX+10)+'px'; };
-    window.hiH = () => document.getElementById('holiday-popup').style.display = 'none';
-
     document.addEventListener('click', e => {
-        if(e.target.id === 'notif-bell') document.getElementById('spyder-sidebar').classList.add('open');
-        if(e.target.id === 'side-x') document.getElementById('spyder-sidebar').classList.remove('open');
+        if(e.target.id === 'notif-bell') document.getElementById('spyder-sidebar').classList.toggle('open');
         if(e.target.id === 'prev-mo' && calD.getFullYear() >= 2000) { calD.setMonth(calD.getMonth()-1); drawCal(); }
         if(e.target.id === 'next-mo' && calD.getFullYear() <= 3000) { calD.setMonth(calD.getMonth()+1); drawCal(); }
         if(e.target.id === 'add-rem-btn') {
-            const t = prompt("Reminder Title:"), tm = prompt("Time (HH:MM):");
-            if(t && tm) { rems.push({t, tm, id: Date.now()}); localStorage.setItem('spyderReminders', JSON.stringify(rems)); renderRems(); }
+            const t = prompt("Title:"), tm = prompt("Time (HH:MM):");
+            if(t && tm) { rems.push({t, tm, id: Date.now(), fired: false}); localStorage.setItem('spyderReminders', JSON.stringify(rems)); renderRems(); }
         }
     });
 
@@ -328,8 +341,9 @@ function randRange(min, max) {
         fr=0; last=n; 
     } requestAnimationFrame(fps); }
 
-    function renderRems() { document.getElementById('rem-list').innerHTML = rems.map(r => `<div><input type="checkbox" onchange="killR(${r.id})"> ${r.t} <span style="color:#f00">${r.tm}</span></div>`).join('') || "No reminders."; }
-    window.killR = (id) => { if(confirm("End reminder?")) { rems = rems.filter(x => x.id !== id); localStorage.setItem('spyderReminders', JSON.stringify(rems)); renderRems(); } };
+    function renderRems() { document.getElementById('rem-list').innerHTML = rems.map(r => `<div style="font-size:11px; margin-bottom:5px;"><input type="checkbox" onchange="killR(${r.id})"> ${r.t} <span style="color:#f00; float:right;">${r.tm}</span></div>`).join('') || "No reminders."; }
+    window.killR = (id) => { rems = rems.filter(x => x.id !== id); localStorage.setItem('spyderReminders', JSON.stringify(rems)); renderRems(); };
 
+    if (window.Notification && Notification.permission !== "granted") Notification.requestPermission();
     setInterval(tick, 1000); fps(); drawCal(); renderRems();
 })();
