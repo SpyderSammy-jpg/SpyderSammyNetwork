@@ -114,51 +114,47 @@ html, body, #particles-js, .main, .center, .container {
   text-decoration: none;
   font-weight: bold;
 }
-/* --- SpyderSystem Ultimate Global Styles --- */
+/* --- Professional SpyderTaskbar Styles --- */
 #spyder-bar {
-    position: fixed; bottom: 0; left: 0; width: 100%; height: 45px;
-    background: #000; border-top: 1px solid #333; color: #fff;
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+    background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
+    border-top: 1px solid #222; color: #fff;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; font-family: sans-serif; z-index: 10002;
+    padding: 0 20px; font-family: 'Segoe UI', Tahoma, sans-serif; z-index: 10002;
 }
 
-.left-group, .right-group { display: flex; align-items: center; gap: 12px; }
+.left-group, .right-group { display: flex; align-items: center; gap: 18px; }
 
-/* Left Side: FPS and Short Bars */
-.fps-box { display: flex; flex-direction: column; align-items: center; min-width: 45px; line-height: 1; }
-.status-dot { width: 7px; height: 7px; border-radius: 50%; margin: 2px 0; border: 1px solid #000; }
+/* Windows-style Groups */
+.fps-box { display: flex; flex-direction: column; align-items: center; min-width: 40px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; margin: 2px 0; }
 .beep-anim { animation: spyderBeep 0.5s infinite; }
-@keyframes spyderBeep { 0% { background: #f00; } 50% { background: #ff0; } 100% { background: #f00; } }
+@keyframes spyderBeep { 0%, 100% { background: #f00; } 50% { background: #ff0; } }
 
-.short-bars { display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: bold; color: #f00; }
-.short-bars input { width: 35px; accent-color: #f00; cursor: pointer; }
+.short-bars { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 600; color: #ff0000; }
+.short-bars input { width: 45px; accent-color: #ff0000; cursor: pointer; height: 3px; }
 
-/* Right Side: Battery, Bell, Time Stack */
-.battery-group { display: flex; align-items: center; gap: 4px; margin-right: 5px; }
-.batt-container { width: 22px; height: 11px; border: 1px solid #555; padding: 1px; border-radius: 2px; position: relative; }
-#batt-fill { height: 100%; width: 0%; transition: 0.3s; }
-#charge-icon { font-size: 10px; color: #ff0; }
+/* Right Group Spacing */
+.battery-group { display: flex; align-items: center; gap: 6px; cursor: help; padding: 5px; border-radius: 4px; transition: background 0.2s; }
+.battery-group:hover { background: rgba(255,255,255,0.1); }
+.batt-container { width: 24px; height: 12px; border: 1px solid #777; padding: 1px; border-radius: 2px; position: relative; }
+#batt-fill { height: 100%; width: 0%; transition: 0.5s ease-in-out; }
+#charge-icon { font-size: 11px; color: #ff0; }
 
-.time-stack { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
-#bar-time { font-size: 14px; font-weight: 900; }
-#bar-date { font-size: 9px; color: #888; }
-#notif-bell { font-size: 18px; cursor: pointer; transition: 0.2s; }
-#notif-bell:hover { color: #f00; transform: scale(1.1); }
+.time-stack { display: flex; flex-direction: column; align-items: center; margin-right: 10px; cursor: default; }
+#bar-time { font-size: 13px; font-weight: 500; }
+#bar-date { font-size: 11px; color: #aaa; }
+
+#notif-bell { font-size: 16px; cursor: pointer; padding: 8px; border-radius: 4px; }
+#notif-bell:hover { background: rgba(255,0,0,0.2); color: #ff0000; }
 
 /* Sidebar & Calendar */
 #spyder-sidebar {
-    position: fixed; right: -350px; top: 0; width: 320px; height: calc(100% - 45px);
-    background: #000; border-left: 2px solid #f00; z-index: 10001; padding: 20px; transition: 0.4s; overflow-y: auto;
+    position: fixed; right: -350px; top: 0; width: 320px; height: calc(100% - 40px);
+    background: #0a0a0a; border-left: 1px solid #333; z-index: 10001; padding: 20px; transition: 0.3s ease; overflow-y: auto;
 }
-#spyder-sidebar.open { right: 0; }
-.close-side { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #f00; }
-.sidebar-box { border: 1px solid #333; padding: 10px; margin-bottom: 15px; background: #050505; border-radius: 4px; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 10px; text-align: center; }
-.cal-day { padding: 5px; border: 1px solid #222; }
-.cal-today { background: #f00; color: #000; font-weight: bold; }
-.cal-holiday { color: #ff0 !important; border: 1px solid #ff0 !important; cursor: pointer; }
-
-#holiday-popup {
-    position: fixed; background: #111; border: 1px solid #f00; color: #fff;
-    padding: 8px; font-size: 10px; border-radius: 4px; z-index: 10005; display: none; pointer-events: none;
-}
+#spyder-sidebar.open { right: 0; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+.sidebar-box { border: 1px solid #222; padding: 12px; margin-bottom: 15px; background: #111; border-radius: 4px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 11px; }
+.cal-day { padding: 8px; border: 1px solid transparent; }
+.cal-holiday { color: #ffff00 !important; font-weight: bold; border-bottom: 2px solid #ffff00 !important; cursor: help; }
