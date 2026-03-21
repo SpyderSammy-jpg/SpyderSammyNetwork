@@ -217,3 +217,159 @@ function getRandomUrl() {
 function randRange(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
+/* --- SpyderSystem Auto-Injection with Active Alarms --- */
+(function() {
+    const ui = `
+    <div id="spyder-bar">
+        <div class="bar-section">
+            <span id="bar-time">00:00:00</span>
+            <span id="bar-date" style="color:#666">Date</span>
+        </div>
+        <div class="bar-section">
+            <span>FPS: <span id="fps-val" style="color:#ffff00">0</span></span>
+            <div id="fps-dot" class="status-dot"></div>
+            <span id="online-status">Online</span>
+            <span>Vol <input type="range" id="vol-slider" min="0" max="100" value="100"></span>
+            <span>Bri <input type="range" id="bri-slider" min="10" max="100" value="100"></span>
+            <span id="notif-icon" style="cursor:pointer; font-size:18px;">📅</span>
+        </div>
+    </div>
+    <div id="spyder-sidebar">
+        <h2 class="red-text">Reminders <button class="add-btn" id="spyder-add-rem">+</button></h2>
+        <div id="reminder-list" class="sidebar-box"></div>
+        <h3 class="red-text">Notifications</h3>
+        <div id="notif-list" class="sidebar-box">No current notifications</div>
+        <h3 class="red-text">Countdown until school ends</h3>
+        <div class="sidebar-box" id="school-countdown" style="font-size:18px; text-align:center;"></div>
+        <p style="font-size:10px; color:#666; text-align:center;">*countdown may be inaccurate</p>
+        <h3 class="yellow-text">National Day</h3>
+        <div id="national-day" class="sidebar-box">Checking...</div>
+        <h2 class="red-text">SpyderCalendar</h2>
+        <div id="cal-container" class="sidebar-box"></div>
+    </div>
+    <div id="bri-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; pointer-events:none; z-index:9999; opacity:0;"></div>`;
+
+    document.body.insertAdjacentHTML('beforeend', ui);
+
+    let rems = JSON.parse(localStorage.getItem('spyderReminders') || '[]');
+
+    function tick() {
+        const now = new Date();
+        document.getElementById('bar-time').innerText = now.toLocaleTimeString();
+        document.getElementById('bar-date').innerText = now.toLocaleDateString();
+
+        // National Day Fact Logic
+        const facts = { "3-20": "International Day of Happiness", "3-21": "World Poetry Day", "3-22": "World Water Day" };
+        const key = `${now.getMonth()+1}-${now.getDate()}`;
+        document.getElementById('national-day').innerText = facts[key] || "Nothing special about today!";
+
+        // School Countdown (June 19, 2026)
+        const diff = new Date("2026-06-19") - now;
+        const d = Math.floor(diff / (86400000));
+        document.getElementById('school-countdown').innerText = d > 0 ? d + " Days Remaining" : "School Ended!";
+
+        // --- REMINDER WATCHER ---
+        const currentTimeString = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        rems.forEach(r => {
+            if (r.tm === currentTimeString && !r.notified) {
+                sendSpyderNotification(r.t);
+                r.notified = true; // Prevents spamming every second within the same minute
+                localStorage.setItem('spyderReminders', JSON.stringify(rems));
+            }
+        });
+    }
+
+    function sendSpyderNotification(title) {
+        // Log into the sidebar notifications list
+        const nList = document.getElementById('notif-list');
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const notifHtml = `<div style="border-bottom:1px solid #222; padding:5px 0;">
+            <span style="color:#ff0000; font-weight:bold;">Reminder:</span> ${title} 
+            <br><small style="color:#555">${time}</small>
+        </div>`;
+        
+        if (nList.innerText.includes("No current")) nList.innerHTML = "";
+        nList.insertAdjacentHTML('afterbegin', notifHtml);
+
+        // Actual Browser Popup
+        if (Notification.permission === "granted") {
+            new Notification("SpyderSammy Reminder", { body: title, icon: "/favicon.ico" });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission();
+        } else {
+            alert("ALARM: " + title);
+        }
+    }
+
+    // FPS Engine (Checks every frame)
+    let frames = 0, last = performance.now();
+    function fpsLoop() {
+        frames++;
+        const now = performance.now();
+        if (now >= last + 1000) {
+            document.getElementById('fps-val').innerText = frames;
+            const dot = document.getElementById('fps-dot');
+            const stat = document.getElementById('online-status');
+            if (frames === 0) { dot.style.background = "red"; stat.innerText = "Offline"; }
+            else if (frames < 20) { dot.classList.add('beep-anim'); stat.innerText = "Lagging"; }
+            else { dot.style.background = "#00ff00"; dot.classList.remove('beep-anim'); stat.innerText = "Online"; }
+            frames = 0; last = now;
+        }
+        requestAnimationFrame(fpsLoop);
+    }
+
+    // Calendar Render
+    function drawCal() {
+        const d = new Date();
+        const daysInMo = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        document.getElementById('cal-container').innerHTML = `
+            <div style="text-align:center; margin-bottom:5px; font-weight:bold;">${d.toLocaleString('default', {month:'long'})} ${d.getFullYear()}</div>
+            <div class="calendar-grid">` + 
+            Array.from({length: daysInMo}, (_, i) => `<div class="cal-day ${i+1 === d.getDate() ? 'cal-today' : ''}">${i+1}</div>`).join('') + 
+            `</div>`;
+    }
+
+    // UI Events
+    document.addEventListener('input', (e) => {
+        if(e.target.id === 'bri-slider') document.getElementById('bri-overlay').style.opacity = (100 - e.target.value) / 100;
+        if(e.target.id === 'vol-slider') document.querySelectorAll('audio, video').forEach(a => a.volume = e.target.value / 100);
+    });
+
+    document.addEventListener('click', (e) => {
+        if(e.target.id === 'notif-icon') document.getElementById('spyder-sidebar').classList.toggle('open');
+        if(e.target.id === 'spyder-add-rem') {
+            const t = prompt("Reminder Title:"); if(!t) return;
+            const tm = prompt("Time (24h format HH:MM):", "14:30");
+            rems.push({ t, tm, id: Date.now(), notified: false });
+            localStorage.setItem('spyderReminders', JSON.stringify(rems));
+            renderRems();
+        }
+    });
+
+    window.killRem = (id) => {
+        if(confirm("Are you sure you want to end this reminder?")) {
+            rems = rems.filter(r => r.id !== id);
+            localStorage.setItem('spyderReminders', JSON.stringify(rems));
+            renderRems();
+        }
+    };
+
+    function renderRems() {
+        const rList = document.getElementById('reminder-list');
+        if (rList) {
+            rList.innerHTML = rems.map(r => `
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; border-bottom: 1px solid #111; padding-bottom:2px;">
+                    <span><input type="checkbox" onchange="killRem(${r.id})"> • ${r.t}</span>
+                    <span style="color:#ff0000; font-weight:bold;">${r.tm}</span>
+                </div>`).join('') || "No reminders.";
+        }
+    }
+
+    // Permission check for notifications on start
+    if (window.Notification && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    setInterval(tick, 1000);
+    fpsLoop(); drawCal(); renderRems();
+})();
