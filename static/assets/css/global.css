@@ -114,41 +114,51 @@ html, body, #particles-js, .main, .center, .container {
   text-decoration: none;
   font-weight: bold;
 }
-/* --- SpyderSystem Updated Layout --- */
+/* --- SpyderSystem Ultimate Global Styles --- */
 #spyder-bar {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 45px;
     background: #000; border-top: 1px solid #333; color: #fff;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; font-family: sans-serif; z-index: 10002; /* Higher than sidebar */
+    padding: 0 15px; font-family: sans-serif; z-index: 10002;
 }
 
 .left-group, .right-group { display: flex; align-items: center; gap: 12px; }
 
-/* Left Side: FPS then Bars */
-.fps-box { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 2px; }
+/* Left Side: FPS and Short Bars */
+.fps-box { display: flex; flex-direction: column; align-items: center; min-width: 45px; line-height: 1; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; margin: 2px 0; border: 1px solid #000; }
+.beep-anim { animation: spyderBeep 0.5s infinite; }
+@keyframes spyderBeep { 0% { background: #f00; } 50% { background: #ff0; } 100% { background: #f00; } }
 
-.short-bars { display: flex; align-items: center; gap: 8px; }
-.short-bars label { font-size: 9px; color: #ff0000; font-weight: bold; }
-.short-bars input[type="range"] { width: 40px; accent-color: #ff0000; cursor: pointer; }
+.short-bars { display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: bold; color: #f00; }
+.short-bars input { width: 35px; accent-color: #f00; cursor: pointer; }
 
-/* Right Side: Bell then Time/Date Stack */
-.time-stack { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; margin-left: 10px; }
-#bar-time { font-size: 14px; font-weight: bold; color: #fff; }
-#bar-date { font-size: 10px; color: #888; }
-#notif-bell { font-size: 18px; cursor: pointer; transition: transform 0.2s; }
-#notif-bell:hover { transform: scale(1.2); color: #ff0000; }
+/* Right Side: Battery, Bell, Time Stack */
+.battery-group { display: flex; align-items: center; gap: 4px; margin-right: 5px; }
+.batt-container { width: 22px; height: 11px; border: 1px solid #555; padding: 1px; border-radius: 2px; position: relative; }
+#batt-fill { height: 100%; width: 0%; transition: 0.3s; }
+#charge-icon { font-size: 10px; color: #ff0; }
 
-/* Sidebar Adjustments */
+.time-stack { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+#bar-time { font-size: 14px; font-weight: 900; }
+#bar-date { font-size: 9px; color: #888; }
+#notif-bell { font-size: 18px; cursor: pointer; transition: 0.2s; }
+#notif-bell:hover { color: #f00; transform: scale(1.1); }
+
+/* Sidebar & Calendar */
 #spyder-sidebar {
-    position: fixed; right: -350px; top: 0; width: 320px; height: calc(100% - 45px); /* Leave bar visible */
-    background: #000; border-left: 2px solid #ff0000; color: #fff;
-    transition: 0.4s; z-index: 10001; padding: 20px; overflow-y: auto;
+    position: fixed; right: -350px; top: 0; width: 320px; height: calc(100% - 45px);
+    background: #000; border-left: 2px solid #f00; z-index: 10001; padding: 20px; transition: 0.4s; overflow-y: auto;
 }
 #spyder-sidebar.open { right: 0; }
-.close-sidebar { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #ff0000; }
+.close-side { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: #f00; }
+.sidebar-box { border: 1px solid #333; padding: 10px; margin-bottom: 15px; background: #050505; border-radius: 4px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; font-size: 10px; text-align: center; }
+.cal-day { padding: 5px; border: 1px solid #222; }
+.cal-today { background: #f00; color: #000; font-weight: bold; }
+.cal-holiday { color: #ff0 !important; border: 1px solid #ff0 !important; cursor: pointer; }
 
-/* Calendar Arrows */
-.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.cal-arrow { background: none; border: 1px solid #333; color: #ff0000; cursor: pointer; padding: 2px 8px; border-radius: 4px; }
-.cal-arrow:disabled { color: #222; border-color: #111; }
+#holiday-popup {
+    position: fixed; background: #111; border: 1px solid #f00; color: #fff;
+    padding: 8px; font-size: 10px; border-radius: 4px; z-index: 10005; display: none; pointer-events: none;
+}
