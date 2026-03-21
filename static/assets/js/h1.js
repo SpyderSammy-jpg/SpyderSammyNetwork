@@ -220,86 +220,97 @@ function randRange(min, max) {
 (function() {
     const ui = `
     <div id="spyder-bar">
-        <div class="left-group">
-            <div class="system-item" id="start-node"><img src="https://img.icons8.com" width="20"></div>
-            <div class="system-item">
-                <span id="fps-val" style="color:#ff0; font-size:11px; margin-right:4px;">0</span>
-                <div id="fps-dot" class="status-dot"></div>
-            </div>
-            <div class="short-bars">
-                <input type="range" id="vol-slider" min="0" max="100" value="100" title="Volume">
-                <input type="range" id="bri-slider" min="0" max="100" value="100" title="Brightness">
-            </div>
+        <div class="bar-left">
+            <div id="fps-dot" class="status-dot"></div>
+            <span id="online-status" style="font-weight:bold;">Online</span>
+            <span style="font-size:11px; color:#888;">FPS: <span id="fps-val">0</span></span>
         </div>
-        <div class="right-group">
-            <div class="system-item" id="batt-btn" onclick="alert('Battery: ' + document.getElementById('batt-text').innerText)">
-                <span id="charge-icon" style="margin-right:2px">⚡</span>
-                <div class="batt-container" style="width:22px; height:11px; border:1px solid #777; padding:1px; border-radius:2px;">
-                    <div id="batt-fill" style="height:100%; background:#0f0;"></div>
-                </div>
-                <span id="batt-text" style="display:none">--%</span>
-            </div>
-            <div class="system-item" id="notif-bell">🔔</div>
-            <div class="system-item" id="clock-tray" style="margin-right:8px;">
-                <div class="time-stack">
-                    <span id="bar-time">00:00</span>
-                    <span id="bar-date">Date</span>
-                </div>
-            </div>
+        
+        <div class="bar-center">
+            <span>Vol <input type="range" id="vol-slider" min="0" max="100" value="80"></span>
+            <span>Bri <input type="range" id="bri-slider" min="10" max="100" value="100"></span>
+        </div>
+
+        <div class="bar-right">
+            <span id="bar-date" style="color:#aaa;">Date</span>
+            <span id="bar-time" style="font-family:monospace; font-size:15px;">00:00:00</span>
+            <span id="notif-icon" style="cursor:pointer; font-size:20px; color:#ff0000;">📅</span>
         </div>
     </div>
     <div id="spyder-sidebar">
-        <span class="close-side" id="side-x">&times;</span>
-        <h3 class="red-text">ACTION CENTER</h3>
-        <div id="notif-history" class="sidebar-box">No new notifications.</div>
-        <h3 class="red-text">CALENDAR AGENDA</h3>
-        <div id="cal-box" class="sidebar-box"></div>
+        <h2 class="red-text">Reminders <button class="add-btn" id="spyder-add-rem">+</button></h2>
+        <div id="reminder-list" class="sidebar-box"></div>
+        
+        <h3 class="red-text">Notifications</h3>
+        <div id="notif-list" class="sidebar-box">No current notifications</div>
+        
+        <h3 class="red-text">Countdown to School End</h3>
+        <div id="school-countdown" style="font-size:22px; text-align:center; color:#ffff00;"></div>
+        
+        <h3 class="yellow-text">National Day Fact</h3>
+        <div id="national-day" class="sidebar-box" style="font-style:italic;"></div>
+
+        <h2 class="red-text">SpyderCalendar</h2>
+        <div id="cal-container" class="sidebar-box"></div>
     </div>
     <div id="bri-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; pointer-events:none; z-index:9999; opacity:0;"></div>`;
 
     document.body.insertAdjacentHTML('beforeend', ui);
 
-    const holidays = { "12-25": "Christmas Day", "3-21": "National Memory Day", "3-22": "World Water Day" };
+    // --- Core Logic ---
+    function tick() {
+        const now = new Date();
+        document.getElementById('bar-time').innerText = now.toLocaleTimeString(); // Includes Seconds
+        document.getElementById('bar-date').innerText = now.toDateString();
 
-    // Unified Click Handler for Calendar Events
-    document.addEventListener('click', e => {
-        if(e.target.classList.contains('cal-holiday')) {
-            const dateKey = e.target.getAttribute('data-date');
-            alert(`Event: ${holidays[dateKey]}`);
-        }
-        if(e.target.id === 'clock-tray' || e.target.id === 'notif-bell') {
-            document.getElementById('spyder-sidebar').classList.toggle('open');
-        }
-    });
+        // National Day Fact (Real March 21 Fact)
+        const key = `${now.getMonth()+1}-${now.getDate()}`;
+        const facts = { "3-21": "National Countdown Day", "3-22": "National Goof Off Day" };
+        document.getElementById('national-day').innerText = facts[key] || "Nothing special about today!";
 
-    function drawCal() {
-        const d = new Date(), m = d.getMonth(), y = d.getFullYear();
-        const days = new Date(y, m + 1, 0).getDate();
-        let h = `<div class="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center;">`;
-        for(let i=1; i<=days; i++) {
-            const key = `${m+1}-${i}`;
-            const isH = holidays[key];
-            h += `<div class="cal-day ${isH?'cal-holiday':''}" data-date="${key}">${i}</div>`;
-        }
-        document.getElementById('cal-box').innerHTML = h + `</div>`;
+        // Countdown (June 19, 2026)
+        const diff = new Date("2026-06-19") - now;
+        const days = Math.floor(diff / 86400000);
+        document.getElementById('school-countdown').innerText = days > 0 ? days + " Days" : "School's Out!";
     }
 
-    // Battery Tooltip logic
-    if (navigator.getBattery) navigator.getBattery().then(b => {
-        const update = () => {
-            const lvl = Math.round(b.level * 100);
-            document.getElementById('batt-text').innerText = lvl + "%";
-            document.getElementById('batt-fill').style.width = lvl + "%";
-            document.getElementById('charge-icon').style.visibility = b.charging ? "visible" : "hidden";
-        };
-        update(); b.onlevelchange = update; b.onchargingchange = update;
+    // FPS Engine (Checks every millisecond)
+    let frames = 0, last = performance.now();
+    function checkFPS() {
+        frames++;
+        const now = performance.now();
+        if (now >= last + 1000) {
+            const fps = frames;
+            document.getElementById('fps-val').innerText = fps;
+            const dot = document.getElementById('fps-dot');
+            const stat = document.getElementById('online-status');
+            
+            if (fps === 0) { dot.style.background = "red"; stat.innerText = "Offline"; }
+            else if (fps < 20) { dot.classList.add('beep-anim'); stat.innerText = "Online"; }
+            else { dot.style.background = "#00ff00"; dot.classList.remove('beep-anim'); stat.innerText = "Online"; }
+            frames = 0; last = now;
+        }
+        requestAnimationFrame(checkFPS);
+    }
+
+    // Interactive Controls
+    document.addEventListener('input', (e) => {
+        if(e.target.id === 'bri-slider') document.getElementById('bri-overlay').style.opacity = (100 - e.target.value) / 100;
+        if(e.target.id === 'vol-slider') document.querySelectorAll('audio, video').forEach(v => v.volume = e.target.value / 100);
     });
 
-    setInterval(() => {
-        const n = new Date();
-        document.getElementById('bar-time').innerText = n.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        document.getElementById('bar-date').innerText = n.toLocaleDateString([], {day:'2-digit', month:'2-digit', year:'numeric'});
-    }, 1000);
+    document.getElementById('notif-icon').onclick = () => document.getElementById('spyder-sidebar').classList.toggle('open');
 
-    drawCal();
+    // Calendar Generator
+    function renderCal() {
+        const d = new Date();
+        const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+        document.getElementById('cal-container').innerHTML = `
+            <div style="text-align:center; padding-bottom:10px;">${d.toLocaleString('default',{month:'long'})} ${d.getFullYear()}</div>
+            <div class="calendar-grid">` + 
+            Array.from({length: days}, (_, i) => `<div class="cal-day ${i+1===d.getDate()?'cal-today':''}">${i+1}</div>`).join('') + `</div>`;
+    }
+
+    setInterval(tick, 1000);
+    checkFPS(); renderCal();
 })();
