@@ -114,43 +114,43 @@ html, body, #particles-js, .main, .center, .container {
   text-decoration: none;
   font-weight: bold;
 }
-/* --- SpyderSystem Taskbar & Sidebar --- */
+/* --- SpyderSystem Refined Taskbar --- */
 #spyder-bar {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 48px;
     background: rgba(0,0,0,0.95); border-top: 1px solid #333; color: #fff;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; font-family: 'Segoe UI', Tahoma, sans-serif; z-index: 10002;
+    padding: 0 15px; font-family: 'Segoe UI', sans-serif; z-index: 10002;
 }
 
-.task-left { display: flex; align-items: center; gap: 15px; }
-.task-right-btns { display: flex; align-items: center; gap: 5px; margin-right: 15px; }
-
-/* Individual Buttons for Tray */
-.tray-btn {
-    padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: 0.2s;
+/* Individual Taskbar Buttons */
+.task-btn {
+    padding: 5px 10px; border-radius: 4px; cursor: pointer; transition: 0.2s;
     display: flex; align-items: center; gap: 8px; font-size: 14px;
 }
-.tray-btn:hover { background: rgba(255,255,255,0.1); }
+.task-btn:hover { background: rgba(255,255,255,0.1); }
 
-/* Battery Icon with Charging Bolt */
-.battery-container { position: relative; width: 25px; height: 14px; border: 1px solid #fff; border-radius: 2px; padding: 1px; }
-.battery-container::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 6px; background: #fff; border-radius: 0 1px 1px 0; }
-.battery-fill { height: 100%; background: #00ff00; width: 0%; transition: width 0.3s; }
-.battery-bolt {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    color: #ffff00; font-size: 12px; font-weight: bold; text-shadow: 0 0 2px #000;
-    display: none; /* Only shown when charging */
-}
+/* FPS Circle Indicator */
+.fps-indicator { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #222; margin-right: 5px; }
+.fps-flash { animation: fpsOfflineFlash 0.5s infinite; }
+@keyframes fpsOfflineFlash { 0%, 100% { background: red; opacity: 1; } 50% { opacity: 0; } }
 
-/* Sidebar Styling - Fully hidden at -365px */
+/* Sidebar - Fully hidden at -370px */
 #spyder-sidebar {
-    position: fixed; right: -365px; top: 0; width: 350px; height: calc(100% - 48px);
-    background: #000; border-left: 2px solid #ff0000; transition: 0.4s;
+    position: fixed; right: -370px; top: 0; width: 350px; height: calc(100% - 48px);
+    background: #000; border-left: 2px solid #ff0000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 10001; padding: 20px; overflow-y: auto; color: #fff;
 }
 #spyder-sidebar.open { right: 0; }
 
-/* Calendar Navigation */
-.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.cal-btn { background: none; border: 1px solid #444; color: #fff; cursor: pointer; padding: 2px 8px; border-radius: 3px; }
-.cal-btn:hover { border-color: #ff0000; color: #ff0000; }
+/* Calendar Grid Styling */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; background: #111; padding: 10px; border-radius: 4px; }
+.cal-day { text-align: center; padding: 8px; font-size: 12px; border: 1px solid #222; transition: 0.2s; }
+.cal-today { background: #ff0000; color: #000; font-weight: bold; }
+.cal-holiday { border-bottom: 3px solid #ffff00; }
+
+/* Popups for Sliders */
+.spyder-popup {
+    position: fixed; bottom: 55px; right: 20px; width: 100px;
+    background: #000; border: 1px solid #ff0000; padding: 15px;
+    border-radius: 8px; display: none; flex-direction: column; align-items: center; z-index: 10003;
+}
