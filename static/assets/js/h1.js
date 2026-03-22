@@ -243,8 +243,8 @@ function randRange(min, max) {
         </div>
     </div>
 
-    <div id="vol-popup" class="spyder-popup"><span>VOL</span><input type="range" class="thermometer-slider" id="vol-slider" min="0" max="100"></div>
-    <div id="bri-popup" class="spyder-popup"><span>BRI</span><input type="range" class="thermometer-slider" id="bri-slider" min="10" max="100"></div>
+    <div id="vol-popup" class="spyder-popup" style="display:none;"><span>VOL</span><input type="range" class="thermometer-slider" id="vol-slider" min="0" max="100"></div>
+    <div id="bri-popup" class="spyder-popup" style="display:none;"><span>BRI</span><input type="range" class="thermometer-slider" id="bri-slider" min="10" max="100"></div>
 
     <div id="spyder-sidebar">
         <h2 style="color:red;">Reminders <button id="add-rem-btn" style="background:red; border:none; cursor:pointer; color:black; font-weight:bold;">+</button></h2>
@@ -269,29 +269,46 @@ function randRange(min, max) {
     let calDate = new Date();
     let rems = JSON.parse(localStorage.getItem('spyderRems') || '[]');
 
-    // --- Holiday & Festival Database ---
+    // --- Holiday & Festival Database with Greetings ---
     const festivals = {
-        "1-1": "New Year's Day", "1-7": "Orthodox Christmas", "2-17": "Lunar New Year", "2-18": "Ash Wednesday", 
-        "3-3": "Holi", "3-17": "St. Patricks Day", "3-20": "Eid al-Fitr", "4-3": "Good Friday", "4-5": "Easter",
-        "5-1": "Vesak Day", "5-27": "Eid al-Adha", "6-14": "Owner Bday", "2-24": "SpyderSammy Bday",
-        "11-8": "Diwali", "12-25": "Christmas", "12-26": "Kwanzaa"
+        "1-1": { name: "New Year's Day", greet: "Happy New Year!" },
+        "1-7": { name: "Orthodox Christmas", greet: "Merry Orthodox Christmas!" },
+        "2-17": { name: "Lunar New Year", greet: "Happy Lunar New Year!" },
+        "2-18": { name: "Ash Wednesday", greet: "Have a Blessed Ash Wednesday!" },
+        "2-24": { name: "SpyderSammy's Birthday", greet: "Happy Birthday SpyderSammy!" },
+        "3-3": { name: "Holi", greet: "Happy Holi!" },
+        "3-17": { name: "St. Patrick's Day", greet: "Happy St. Patrick's Day!" },
+        "3-19": { name: "Eid al-Fitr", greet: "Eid Mubarak!" },
+        "3-20": { name: "Eid al-Fitr", greet: "Eid Mubarak!" },
+        "4-3": { name: "Good Friday", greet: "Have a Blessed Good Friday!" },
+        "4-5": { name: "Easter", greet: "Happy Easter!" },
+        "5-1": { name: "Vesak Day", greet: "Happy Vesak Day!" },
+        "5-27": { name: "Eid al-Adha", greet: "Eid Mubarak!" },
+        "6-14": { name: "Owner's Birthday", greet: "Happy Birthday Owner!" },
+        "11-8": { name: "Diwali", greet: "Happy Diwali!" },
+        "12-25": { name: "Christmas Day", greet: "Merry Christmas!" },
+        "12-26": { name: "Kwanzaa", greet: "Happy Kwanzaa!" }
     };
 
     // --- Greeting System ---
     function checkGreetings() {
         const key = `${new Date().getMonth() + 1}-${new Date().getDate()}`;
         if (festivals[key] && !sessionStorage.getItem('greeted_' + key)) {
-            alert(`Happy ${festivals[key]}!`);
+            alert(festivals[key].greet);
             sessionStorage.setItem('greeted_' + key, 'true');
         }
     }
 
     // --- Network Logic ---
     document.getElementById('wifi-btn').onclick = () => {
-        const isPortnox = window.location.hostname.includes("portnox") || navigator.onLine; // Basic detector
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        // Conditional Portnox Name detection
+        const isPortnox = window.location.hostname.includes("portnox") || navigator.onLine;
         let msg = `Status: ${navigator.onLine ? 'Online' : 'Offline'}\n`;
-        if (isPortnox) msg += `Name: PORTNOX_STUDENT\nSpeed: ${navigator.connection?.downlink || '---'} Mbps\n`;
-        msg += `Location: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+        if (isPortnox) {
+            msg += `Name: PORTNOX_STUDENT\nSpeed: ${conn?.downlink || '---'} Mbps\n`;
+        }
+        msg += `Location: America/New Jersey/Jersey City/07302`;
         alert(msg);
     };
 
@@ -340,7 +357,7 @@ function randRange(min, max) {
         requestAnimationFrame(tick);
     }
 
-    // --- Calendar with Weekdays ---
+    // --- Interactive Calendar ---
     function drawCal() {
         const d = calDate;
         document.getElementById('cal-header').innerText = d.toLocaleString('default', { month: 'long', year: 'numeric' });
@@ -351,14 +368,16 @@ function randRange(min, max) {
         weekDays.forEach(w => html += `<div class="cal-weekday">${w}</div>`);
         for (let i = 1; i <= days; i++) {
             const k = `${d.getMonth()+1}-${i}`;
-            const isT = (i === new Date().getDate() && d.getMonth() === new Date().getMonth());
-            html += `<div class="cal-day ${isT ? 'cal-today' : ''} ${festivals[k] ? 'cal-event' : ''}" title="${festivals[k] || ''}">${i}</div>`;
+            const isT = (i === new Date().getDate() && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear());
+            const hasEvent = festivals[k];
+            html += `<div class="cal-day ${isT ? 'cal-today' : ''} ${hasEvent ? 'cal-event' : ''}" 
+                     onclick="${hasEvent ? `alert('Event: ${hasEvent.name}')` : ''}">${i}</div>`;
         }
         html += `</div>`;
         document.getElementById('cal-box').innerHTML = html;
     }
 
-    // --- Toggles & Setup ---
+    // --- UI Listeners ---
     document.getElementById('notif-bell-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('spyder-sidebar').classList.toggle('open'); };
     document.getElementById('vol-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('vol-popup').style.display='flex'; };
     document.getElementById('bri-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('bri-popup').style.display='flex'; };
