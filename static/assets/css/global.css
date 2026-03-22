@@ -139,18 +139,28 @@ html, body, #particles-js, .main, .center, .container {
 }
 .thermometer-slider { -webkit-appearance: slider-vertical; height: 130px; accent-color: #ff0000; cursor: pointer; }
 .red-text { color: #ff0000; font-weight: bold; margin-top: 15px; display: block; }
-/* --- SPYDER TOOLS SYSTEM --- */
+/* --- SpyderTools UI & Sliding Logic --- */
 #spyder-tools-toggle {
-    position: fixed; top: 110px; right: 15px; width: 45px; height: 45px;
+    position: fixed; top: 110px; right: 15px; 
+    width: 45px; height: 45px;
     background: #000; border: 2px solid #ff0000; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-size: 24px; z-index: 10005; color: #fff;
+    transition: right 0.4s ease-in-out; /* Sync with sidebar speed */
 }
+
 #spyder-tools-menu {
-    position: fixed; top: 110px; right: 70px; width: 195px;
+    position: fixed; top: 110px; right: 70px; 
+    width: 195px;
     background: #000; border: 1px solid #ff0000; border-radius: 8px;
     display: none; flex-direction: column; gap: 5px; padding: 10px; z-index: 10005;
+    transition: right 0.4s ease-in-out; /* Sync with sidebar speed */
 }
+
+/* Shift tools left when sidebar is open */
+#spyder-sidebar.open ~ #spyder-tools-toggle { right: 365px; }
+#spyder-sidebar.open ~ #spyder-tools-menu { right: 420px; }
+
 .tool-btn {
     background: #1a0000; border: 1px solid #ff0000; color: #fff;
     padding: 10px; cursor: pointer; text-align: left; font-size: 13px; transition: 0.2s;
@@ -170,7 +180,7 @@ html, body, #particles-js, .main, .center, .container {
 .window-body { padding: 15px; color: #fff; }
 .close-win { cursor: pointer; font-weight: bold; font-size: 18px; }
 
-/* Tool Components */
+/* Calculator Fixes */
 #calc-display {
     width: calc(100% - 20px); height: 45px; background: #000; color: #ff0000; 
     border: 1px solid #ff0000; text-align: right; margin: 10px; font-size: 22px; 
@@ -179,12 +189,13 @@ html, body, #particles-js, .main, .center, .container {
 .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 10px 10px 10px; }
 .calc-btn { background: #222; border: 1px solid #ff0000; color: #fff; padding: 15px; cursor: pointer; border-radius: 4px; }
 
+/* Timer Circle */
 #timer-circle {
     width: 140px; height: 140px; border: 4px solid #ff0000; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto;
 }
 
-/* Camera App Styling */
+/* Camera (Screenshots) UI */
 .camera-ui { display: flex; flex-direction: column; align-items: center; gap: 15px; }
 .camera-mode-toggle { display: flex; gap: 20px; background: #111; padding: 5px 15px; border-radius: 20px; border: 1px solid #333; }
 .mode-txt { cursor: pointer; font-size: 12px; font-weight: bold; color: #666; transition: 0.3s; }
