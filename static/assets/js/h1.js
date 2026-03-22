@@ -225,124 +225,108 @@ function randRange(min, max) {
             <span id="online-status">Online</span>
             <span style="font-size:11px; color:#ffff00">FPS: <span id="fps-val">0</span></span>
         </div>
-        <div class="task-right" id="system-tray">
-            <span title="WiFi">📶</span>
-            <span title="Volume">🔊</span>
-            <span id="battery-icon" title="Check Battery">🔋</span>
-            <div style="text-align:right; line-height:1.2; font-size:12px;">
+        
+        <div class="task-right-btns">
+            <div class="tray-btn" id="wifi-btn" title="WiFi Status">📶</div>
+            <div class="tray-btn" id="vol-bri-btn" title="Quick Settings">🔊</div>
+            <div class="tray-btn" id="battery-btn" title="Battery Status">
+                <div class="battery-container">
+                    <div class="battery-fill" id="bat-fill"></div>
+                    <div class="battery-bolt" id="bat-bolt">⚡</div>
+                </div>
+            </div>
+            <div class="tray-btn" id="clock-btn" style="text-align:right; flex-direction:column; line-height:1.1; font-size:12px;">
                 <div id="bar-time">00:00:00</div>
                 <div id="bar-date">0/0/0000</div>
             </div>
-            <span id="notif-bell" style="font-size:18px;">🔔</span>
+            <div class="tray-btn" id="notif-bell-btn" style="font-size:18px;">🔔</div>
         </div>
     </div>
+
     <div id="qs-popup" class="spyder-popup">
         <h3 style="color:#ff0000; margin:0;">Quick Settings</h3>
-        <div style="display:flex; justify-content:space-around; align-items:center;">
+        <div style="display:flex; justify-content:space-around;">
             <div style="text-align:center;"><p>Volume</p><input type="range" class="thermometer-slider" id="vol-slider" min="0" max="100"></div>
-            <div style="text-align:center;"><p>Brightness</p><input type="range" class="thermometer-slider" id="bri-slider" min="10" max="100"></div>
+            <div style="text-align:center;"><p>Brightness</p><input type="range" class="thermometer-slider" id="bri-slider" min="10" max="100" value="100"></div>
         </div>
     </div>
+
     <div id="spyder-sidebar">
         <h2 class="red-text">Reminders <button onclick="addRem()" style="background:#ff0000; border:none; cursor:pointer;">+</button></h2>
         <div id="rem-list" style="border:1px solid #222; padding:10px; min-height:50px;"></div>
-        <h2 class="red-text">Notifications</h2>
-        <div id="notif-list" style="border:1px solid #222; padding:10px; min-height:80px; color:#aaa;">No current notifications</div>
-        <h2 class="red-text">National Day Fact</h2>
-        <div id="nat-fact" style="padding:10px; border:1px solid #222; font-size:13px; color:#ffff00;">Searching events...</div>
-        <h2 class="red-text">Countdown to School End</h2>
-        <div id="countdown-timer" style="font-family:monospace; font-size:20px; color:#ffff00; text-align:center;"></div>
-        <h2 id="cal-title" class="red-text" style="text-align:center;">SpyderCalendar</h2>
+        <h2 class="red-text">SpyderCalendar</h2>
+        <div class="cal-nav">
+            <button class="cal-btn" id="prev-mo"><</button>
+            <span id="cal-header"></span>
+            <button class="cal-btn" id="next-mo">></button>
+        </div>
         <div id="cal-box"></div>
     </div>
     <div id="bri-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; pointer-events:none; z-index:10000; opacity:0;"></div>
     `;
+
     document.body.insertAdjacentHTML('beforeend', ui);
 
-    let rems = JSON.parse(localStorage.getItem('spyderRems') || '[]');
-    let currentHolidays = [];
+    let calDate = new Date();
+    let frames = 0, lastFpsTime = performance.now();
 
-    async function fetchEvents() {
-        try {
-            // Fetches actual national holidays for the US (change "US" to your country code if needed)
-            const res = await fetch('https://date.nager.at');
-            const data = await res.json();
-            currentHolidays = data;
-            updateFact();
-            drawCal();
-        } catch(e) { document.getElementById('nat-fact').innerText = "Nothing special about today!"; }
+    // --- Battery Notification Logic ---
+    async function checkBattery() {
+        const bat = await navigator.getBattery();
+        const update = () => {
+            const level = Math.round(bat.level * 100);
+            document.getElementById('bat-fill').style.width = level + '%';
+            document.getElementById('bat-bolt').style.display = bat.charging ? 'block' : 'none';
+        };
+        document.getElementById('battery-btn').onclick = () => alert(`Battery: ${Math.round(bat.level * 100)}% (${bat.charging ? 'Charging' : 'Discharging'})`);
+        bat.onchargingchange = update; bat.onlevelchange = update; update();
     }
 
-    function updateClock() {
+    // --- WiFi Notification Logic ---
+    document.getElementById('wifi-btn').onclick = () => {
+        const fps = parseInt(document.getElementById('fps-val').innerText);
+        const quality = fps > 40 ? "Excellent" : fps > 20 ? "Good" : "Poor";
+        alert(`Connected: Spyder_Secure_Network\nQuality: ${quality} (Based on ${fps} FPS performance)`);
+    };
+
+    // --- Calendar Navigation (2000-3000) ---
+    function drawCal() {
+        const year = calDate.getFullYear();
+        const month = calDate.getMonth();
+        if (year < 2000 || year > 3000) return; // Bounds
+        
+        document.getElementById('cal-header').innerText = calDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const days = new Date(year, month + 1, 0).getDate();
+        
+        document.getElementById('cal-box').innerHTML = `<div class="calendar-grid">` + 
+            Array.from({length: days}, (_, i) => {
+                const isToday = (i+1 === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear());
+                return `<div class="cal-day ${isToday ? 'cal-today' : ''}">${i+1}</div>`;
+            }).join('') + `</div>`;
+    }
+
+    document.getElementById('prev-mo').onclick = () => { calDate.setMonth(calDate.getMonth() - 1); drawCal(); };
+    document.getElementById('next-mo').onclick = () => { calDate.setMonth(calDate.getMonth() + 1); drawCal(); };
+
+    // --- Button Toggles ---
+    document.getElementById('notif-bell-btn').onclick = () => document.getElementById('spyder-sidebar').classList.toggle('open');
+    document.getElementById('vol-bri-btn').onclick = () => {
+        const qs = document.getElementById('qs-popup');
+        qs.style.display = qs.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    // --- FPS & Clock & Sliders ---
+    function loop() {
         const now = new Date();
         document.getElementById('bar-time').innerText = now.toLocaleTimeString();
         document.getElementById('bar-date').innerText = now.toLocaleDateString();
         
-        const diff = new Date("2026-06-19T00:00:00") - now;
-        const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
-        document.getElementById('countdown-timer').innerText = `${d}d ${h}h ${m}m ${s}s`;
-
-        // Reminder Alarms
-        const timeKey = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-        rems.forEach(r => { if(r.time === timeKey && !r.fired) { alert(`REMINDER: ${r.t}`); r.fired = true; saveRems(); } });
-    }
-
-    function updateFact() {
-        const today = new Date().toISOString().split('T')[0];
-        const h = currentHolidays.find(x => x.date === today);
-        document.getElementById('nat-fact').innerText = h ? `Today is ${h.name}!` : "Nothing special about today!";
-    }
-
-    async function checkBattery() {
-        const bat = await navigator.getBattery();
-        const icon = document.getElementById('battery-icon');
-        const update = () => { icon.innerHTML = bat.charging ? "⚡🔋" : "🔋"; icon.title = `${Math.round(bat.level*100)}%`; };
-        bat.onchargingchange = update; bat.onlevelchange = update; update();
-    }
-
-    let frames = 0, last = performance.now();
-    function checkFPS() {
-        frames++; const now = performance.now();
-        if (now >= last + 1000) {
+        frames++;
+        if (performance.now() >= lastFpsTime + 1000) {
             document.getElementById('fps-val').innerText = frames;
-            const dot = document.getElementById('fps-dot'), stat = document.getElementById('online-status');
-            if (frames < 20) { dot.classList.add('beep-anim'); stat.innerText = "Lagging"; }
-            else { dot.style.background = "#00ff00"; dot.classList.remove('beep-anim'); stat.innerText = "Online"; }
-            frames = 0; last = now;
+            frames = 0; lastFpsTime = performance.now();
         }
-        requestAnimationFrame(checkFPS);
-    }
-
-    window.addRem = () => {
-        const t = prompt("Reminder Title:"), time = prompt("Time (HH:MM):", "12:00");
-        if(t && time) { rems.push({t, time, id: Date.now(), fired: false}); saveRems(); renderRems(); }
-    };
-    function saveRems() { localStorage.setItem('spyderRems', JSON.stringify(rems)); }
-    function renderRems() {
-        document.getElementById('rem-list').innerHTML = rems.map(r => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span><input type="checkbox" onchange="delRem(${r.id})"> ${r.t}</span>
-                <span style="color:#ff0000">${r.time}</span>
-            </div>`).join('') || "No reminders.";
-    }
-    window.delRem = (id) => { if(confirm("End this reminder?")) { rems = rems.filter(r => r.id !== id); saveRems(); renderRems(); }};
-
-    document.getElementById('system-tray').onclick = (e) => {
-        if(e.target.id === 'notif-bell') { document.getElementById('spyder-sidebar').classList.toggle('open'); document.getElementById('qs-popup').style.display='none'; }
-        else { const qs = document.getElementById('qs-popup'); qs.style.display = qs.style.display==='flex'?'none':'flex'; }
-    };
-
-    function drawCal() {
-        const d = new Date();
-        const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-        document.getElementById('cal-title').innerText = d.toLocaleString('default', {month:'long', year:'numeric'});
-        document.getElementById('cal-box').innerHTML = `<div class="calendar-grid">` + 
-            Array.from({length: days}, (_, i) => {
-                const day = i + 1;
-                const isToday = day === d.getDate();
-                return `<div class="cal-day ${isToday?'cal-today':''}">${day}</div>`;
-            }).join('') + `</div>`;
+        requestAnimationFrame(loop);
     }
 
     document.addEventListener('input', (e) => {
@@ -350,5 +334,5 @@ function randRange(min, max) {
         if(e.target.id === 'vol-slider') document.querySelectorAll('audio, video').forEach(v => v.volume = e.target.value / 100);
     });
 
-    setInterval(updateClock, 1000); fetchEvents(); checkFPS(); drawCal(); renderRems(); checkBattery();
+    loop(); checkBattery(); drawCal();
 })();
