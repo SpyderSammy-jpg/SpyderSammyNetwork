@@ -375,13 +375,10 @@ function randRange(min, max) {
     tick(); drawCal(); renderRems(); checkGreetings();
 })();
 (function() {
-    // --- System Permissions ---
-    if (Notification.permission !== "granted") Notification.requestPermission();
-
-    const ui = `
-    <!-- [REPLACE with your existing Taskbar/Sidebar HTML from previous step] -->
-
-    <div id="spyder-tools-toggle" title="SpyderTools">🛠️</div>
+(function() {
+    // --- Setup UI ---
+    const toolsUI = `
+    <div id="spyder-tools-toggle">🛠️</div>
     <div id="spyder-tools-menu">
         <button class="tool-btn" onclick="openTool('calc')">SpyderCalculator</button>
         <button class="tool-btn" onclick="openTool('timer')">SpyderTimer</button>
@@ -390,153 +387,132 @@ function randRange(min, max) {
         <button class="tool-btn" onclick="openTool('chat')">SpyderChat</button>
     </div>
 
-    <!-- WINDOWS -->
-    <div id="win-calc" class="spyder-window" style="bottom:60px; left:20px;">
-        <div class="window-header"><span>Calculator</span><span class="close-win" onclick="closeTool('calc')">X</span></div>
+    <!-- Tool Windows -->
+    <div id="win-calc" class="spyder-window" style="bottom:70px; left:20px;">
+        <div class="window-header"><span>SpyderCalculator</span><span onclick="closeTool('calc')" class="close-win">X</span></div>
         <div class="window-body">
             <input type="text" id="calc-display" readonly style="width:100%; background:#111; color:red; border:1px solid red; text-align:right; margin-bottom:10px; font-size:24px; padding:5px;">
-            <div class="calc-grid">
-                ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C'].map(k => `<button class="calc-btn" onclick="calcInput('${k}')">${k}</button>`).join('')}
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px;">
+                ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C'].map(k=>`<button onclick="calcIn('${k}')" style="padding:15px; background:#222; color:#fff; border:1px solid #444; cursor:pointer;">${k}</button>`).join('')}
             </div>
         </div>
     </div>
 
-    <div id="win-timer" class="spyder-window" style="bottom:60px; left:20px;">
-        <div class="window-header"><span>Timer</span><span class="close-win" onclick="closeTool('timer')">X</span></div>
-        <div class="window-body" style="text-align:center;">
-            <div id="timer-circle"><span id="timer-display">00:00</span></div>
-            <button onclick="setSpyderTimer()" style="margin-top:10px; background:red; border:none; padding:5px 15px; cursor:pointer;">Set Time</button>
+    <div id="win-snip" class="spyder-window" style="bottom:80px; left:50%; transform:translateX(-50%); width:auto; min-width:auto;">
+        <div class="window-header"><span>SpyderCapture Toolbar</span><span onclick="closeTool('snip')" class="close-win">X</span></div>
+        <div class="window-body snip-toolbar-container">
+            <button class="snip-icon-big" onclick="snapTab()" title="Camera Mode">📸</button>
+            <button class="snip-icon-big" onclick="recordTab()" id="rec-icon" title="Telecast Mode">⚪</button>
+            <button class="snip-icon-big" onclick="openTool('gal')" title="View Captures">📂</button>
         </div>
     </div>
 
-    <div id="win-sw" class="spyder-window" style="top:20px; left:20px;">
-        <div class="window-header"><span>Stopwatch</span><span class="close-win" onclick="closeTool('sw')">X</span></div>
-        <div class="window-body" style="text-align:center;">
-            <div id="sw-display" style="font-size:36px; font-family:monospace; margin-bottom:10px;">00:00:00</div>
-            <button id="sw-start" style="background:green; color:white; border:none; padding:8px 20px; cursor:pointer;">Start</button>
-            <button id="sw-reset" style="background:gray; color:white; border:none; padding:8px 20px; cursor:pointer;">Restart</button>
-        </div>
+    <div id="win-gal" class="spyder-window" style="top:50px; right:50px; width:350px;">
+        <div class="window-header"><span>Screencapture History</span><span onclick="closeTool('gal')" class="close-win">X</span></div>
+        <div class="window-body gallery-grid" id="gal-list">No history found.</div>
     </div>
 
-    <div id="win-snip" class="spyder-window" style="top:50%; left:50%; transform:translate(-50%,-50%);">
-        <div class="window-header"><span>Snipping Tool</span><span class="close-win" onclick="closeTool('snip')">X</span></div>
-        <div class="window-body snip-toolbar">
-            <button class="snip-btn" onclick="takeSS()">📸</button>
-            <button class="snip-btn" onclick="toggleRec()" id="rec-btn">⚪</button>
-            <button class="snip-btn" onclick="openGallery()">📂</button>
-        </div>
-    </div>
-
-    <div id="win-chat" class="spyder-window" style="top:100px; left:100px; width:450px;">
-        <div class="window-header"><span>SpyderChat</span><span class="close-win" onclick="closeTool('chat')">X</span></div>
-        <div class="window-body">
+    <div id="win-chat" class="spyder-window" style="top:50px; left:50px; width:450px; height:580px;">
+        <div class="window-header"><span>SpyderChat</span><span onclick="closeTool('chat')" class="close-win">X</span></div>
+        <div class="window-body" style="height:500px;" id="chat-mount">
             <div id="rt-4de6c9c3bab0bfc0f88fcf07ad84e427"></div>
         </div>
     </div>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', ui);
+    document.body.insertAdjacentHTML('beforeend', toolsUI);
 
-    // --- Core Window Logic ---
-    window.openTool = (tool) => {
-        document.querySelectorAll('.spyder-window').forEach(w => w.style.display = 'none');
-        document.getElementById('win-' + tool).style.display = 'flex';
-        if(tool === 'chat' && !window.chatInited) {
-            let s = document.createElement('script'); s.src = "https://rumbletalk.com";
-            document.body.appendChild(s); window.chatInited = true;
+    // --- Window Logic ---
+    window.openTool = (id) => {
+        if(id !== 'gal' && id !== 'snip') document.querySelectorAll('.spyder-window').forEach(w=>w.style.display='none');
+        document.getElementById('win-'+id).style.display = 'flex';
+        
+        if(id === 'chat') {
+            document.getElementById('chat-mount').innerHTML = '<div id="rt-4de6c9c3bab0bfc0f88fcf07ad84e427"></div>';
+            const s = document.createElement('script');
+            s.src = "https://rumbletalk.com/client/?8gfMMEkC";
+            document.body.appendChild(s);
         }
+        if(id === 'gal') loadGal();
     };
-    window.closeTool = (tool) => document.getElementById('win-' + tool).style.display = 'none';
-
+    window.closeTool = (id) => document.getElementById('win-'+id).style.display = 'none';
     document.getElementById('spyder-tools-toggle').onclick = () => {
         const m = document.getElementById('spyder-tools-menu');
         m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    // --- Desktop Notification Helper ---
-    function notify(title, body) {
-        if (Notification.permission === "granted") new Notification(title, { body: body });
-        else alert(title + ": " + body);
-    }
-
-    // --- Calculator Engine ---
-    window.calcInput = (v) => {
-        const d = document.getElementById('calc-display');
-        if(v === '=') d.value = eval(d.value);
-        else if(v === 'C') d.value = '';
-        else d.value += v;
-    };
-
-    // --- Timer Engine ---
-    let tInt;
-    window.setSpyderTimer = () => {
-        let sec = prompt("How many seconds?") || 0;
-        clearInterval(tInt);
-        tInt = setInterval(() => {
-            sec--;
-            let m = Math.floor(sec/60), s = sec%60;
-            document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            if(sec <= 0) { clearInterval(tInt); notify("SpyderTimer", "Timer has ended!"); }
-        }, 1000);
-    };
-
-    // --- Stopwatch Engine ---
-    let swInt, swStartAt = 0, swElapsed = 0;
-    document.getElementById('sw-start').onclick = function() {
-        if(this.innerText === "Start") {
-            this.innerText = "Stop"; this.style.background = "red";
-            swStartAt = Date.now() - swElapsed;
-            swInt = setInterval(() => {
-                swElapsed = Date.now() - swStartAt;
-                let ms = Math.floor((swElapsed % 1000) / 10), s = Math.floor((swElapsed / 1000) % 60), m = Math.floor(swElapsed / 60000);
-                document.getElementById('sw-display').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}:${ms.toString().padStart(2,'0')}`;
-            }, 10);
-        } else {
-            this.innerText = "Start"; this.style.background = "green";
-            clearInterval(swInt);
-        }
-    };
-    document.getElementById('sw-reset').onclick = () => { swElapsed = 0; document.getElementById('sw-display').innerText = "00:00:00"; };
-
-    // --- Screen Capture Engine ---
-    let mediaRec, chunks = [];
-    window.takeSS = async () => {
-        const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-        const vid = document.createElement('video'); vid.srcObject = stream; await vid.play();
-        const canvas = document.createElement('canvas'); canvas.width = vid.videoWidth; canvas.height = vid.videoHeight;
+    // --- Screenshot Engine ---
+    window.snapTab = async () => {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ preferCurrentTab: true });
+        const vid = document.createElement('video');
+        vid.srcObject = stream;
+        await vid.play();
+        const canvas = document.createElement('canvas');
+        canvas.width = vid.videoWidth; canvas.height = vid.videoHeight;
         canvas.getContext('2d').drawImage(vid, 0, 0);
-        const data = canvas.toDataURL();
-        let gallery = JSON.parse(localStorage.getItem('spyder_gallery') || '[]');
-        gallery.push({type:'img', data, time: Date.now()});
-        localStorage.setItem('spyder_gallery', JSON.stringify(gallery));
+        const data = canvas.toDataURL('image/png');
         stream.getTracks().forEach(t => t.stop());
-        alert("Screenshot Captured!");
+
+        const preview = window.open("");
+        preview.document.write(`
+            <body style="background:#000; color:#fff; text-align:center; font-family:sans-serif; padding:50px;">
+                <h1>SpyderCapture Preview</h1>
+                <img src="${data}" style="max-width:80%; border:2px solid red; margin-bottom:20px;">
+                <br>
+                <button onclick="opener.saveCapture('${data}', 'img'); alert('Saved!'); window.close();" style="background:red; color:white; padding:20px 40px; border:none; cursor:pointer; font-size:20px; font-weight:bold;">SAVE TO HISTORY</button>
+            </body>`);
     };
 
-    window.toggleRec = async () => {
-        const btn = document.getElementById('rec-btn');
-        if(btn.innerText === '🔴') { mediaRec.stop(); btn.innerText = '⚪'; return; }
-        const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-        mediaRec = new MediaRecorder(stream);
-        mediaRec.ondataavailable = e => chunks.push(e.data);
-        mediaRec.onstop = () => {
-            const blob = new Blob(chunks, {type:'video/webm'});
+    // --- Telecast Mode (Video) ---
+    let recorder, chunks = [];
+    window.recordTab = async () => {
+        const icon = document.getElementById('rec-icon');
+        if(icon.innerText === '🔴') { recorder.stop(); icon.innerText = '⚪'; return; }
+        
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
-            window.open(url); // Auto-open for preview
-            let gallery = JSON.parse(localStorage.getItem('spyder_gallery') || '[]');
-            gallery.push({type:'vid', data: url, time: Date.now()});
-            localStorage.setItem('spyder_gallery', JSON.stringify(gallery));
+            window.open(url); // Preview video
+            saveCapture(url, 'vid');
             chunks = [];
         };
-        mediaRec.start(); btn.innerText = '🔴';
+        recorder.start(); icon.innerText = '🔴';
     };
 
-    // --- Drag Logic ---
+    window.saveCapture = (data, type) => {
+        const gal = JSON.parse(localStorage.getItem('spyder_gal') || '[]');
+        gal.push({ type, data, date: new Date().toLocaleString() });
+        localStorage.setItem('spyder_gal', JSON.stringify(gal));
+    };
+
+    window.loadGal = () => {
+        const gal = JSON.parse(localStorage.getItem('spyder_gal') || '[]');
+        document.getElementById('gal-list').innerHTML = gal.length ? gal.map(item => `
+            <div class="gallery-card">
+                <small>${item.date}</small><br>
+                ${item.type==='img' ? `<img src="${item.data}" style="width:100%; margin-top:5px; cursor:pointer;" onclick="window.open('${item.data}')">` : `<button onclick="window.open('${item.data}')" style="width:100%; padding:10px; background:#222; border:1px solid red; color:#fff; cursor:pointer; margin-top:5px;">▶ Play Video</button>`}
+            </div>
+        `).join('') : "No captures saved.";
+    };
+
+    // --- Draggable Logic ---
     document.querySelectorAll('.window-header').forEach(h => {
         h.onmousedown = (e) => {
-            let w = h.parentElement; let ox = e.clientX - w.offsetLeft, oy = e.clientY - w.offsetTop;
-            document.onmousemove = (e) => { w.style.left = (e.clientX - ox) + "px"; w.style.top = (e.clientY - oy) + "px"; w.style.bottom = "auto"; };
+            let w = h.parentElement;
+            let ox = e.clientX - w.offsetLeft, oy = e.clientY - w.offsetTop;
+            document.onmousemove = (e) => {
+                w.style.left = (e.clientX - ox) + "px"; w.style.top = (e.clientY - oy) + "px";
+                w.style.bottom = "auto"; w.style.right = "auto";
+            };
             document.onmouseup = () => document.onmousemove = null;
         };
     });
+
+    window.calcIn = (v) => {
+        const d = document.getElementById('calc-display');
+        if(v === '=') d.value = eval(d.value); else if(v === 'C') d.value = ''; else d.value += v;
+    };
 })();
