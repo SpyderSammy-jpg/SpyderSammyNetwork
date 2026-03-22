@@ -211,3 +211,29 @@ html, body, #particles-js, .main, .center, .container {
 .gal-item { border: 1px solid #333; padding: 10px; margin-bottom: 10px; background: #111; }
 .gal-dl-btn { background: #0088ff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; width: 100%; font-size: 11px; }
 .gal-clear-btn { background: #ff0000; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+/* --- SpyderNotes (Sticky) --- */
+.spyder-sticky {
+    position: fixed; width: 200px; min-height: 200px;
+    padding: 10px; z-index: 10008; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; cursor: move;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.sticky-header {
+    display: flex; justify-content: space-between;
+    font-size: 14px; margin-bottom: 5px; opacity: 0.6;
+}
+
+.sticky-content {
+    flex-grow: 1; border: none; background: transparent;
+    resize: none; outline: none; font-size: 16px; line-height: 1.2;
+}
+
+.sticky-pin { cursor: pointer; margin-right: 8px; }
+.sticky-pin.active { color: #ff0000; font-weight: bold; }
+
+/* Sticky Colors */
+.sticky-yellow { background: #ffff88; color: #333; }
+.sticky-blue { background: #88ffff; color: #333; }
+.sticky-pink { background: #ff88ff; color: #333; }
+.sticky-green { background: #88ff88; color: #333; }
