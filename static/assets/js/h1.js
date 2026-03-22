@@ -375,167 +375,163 @@ function randRange(min, max) {
     tick(); drawCal(); renderRems(); checkGreetings();
 })();
 (function() {
-    // --- System Permissions ---
-    if (Notification.permission !== "granted") Notification.requestPermission();
-
-    const ui = `
-    <!-- [REPLACE with your existing Taskbar/Sidebar HTML from previous step] -->
-
-    <div id="spyder-tools-toggle" title="SpyderTools">🛠️</div>
+    const toolHTML = `
+    <div id="spyder-tools-toggle">🛠️</div>
     <div id="spyder-tools-menu">
-        <button class="tool-btn" onclick="openTool('calc')">SpyderCalculator</button>
-        <button class="tool-btn" onclick="openTool('timer')">SpyderTimer</button>
-        <button class="tool-btn" onclick="openTool('sw')">SpyderStopwatch</button>
-        <button class="tool-btn" onclick="openTool('snip')">SpyderScreenshot</button>
-        <button class="tool-btn" onclick="openTool('chat')">SpyderChat</button>
+        <button class="tool-btn" onclick="openSTool('calc')">SpyderCalculator</button>
+        <button class="tool-btn" onclick="openSTool('timer')">SpyderTimer</button>
+        <button class="tool-btn" onclick="openSTool('sw')">SpyderStopwatch</button>
+        <button class="tool-btn" onclick="openSTool('snip')">SpyderScreenshot</button>
+        <button class="tool-btn" onclick="openSTool('chat')">SpyderChat</button>
     </div>
 
-    <!-- WINDOWS -->
-    <div id="win-calc" class="spyder-window" style="bottom:60px; left:20px;">
-        <div class="window-header"><span>Calculator</span><span class="close-win" onclick="closeTool('calc')">X</span></div>
+    <!-- Window: Calculator -->
+    <div id="win-calc" class="spyder-window" style="bottom:60px; left:30px;">
+        <div class="window-header"><span>SpyderCalculator</span><span class="close-win" onclick="closeSTool('calc')">X</span></div>
         <div class="window-body">
-            <input type="text" id="calc-display" readonly style="width:100%; background:#111; color:red; border:1px solid red; text-align:right; margin-bottom:10px; font-size:24px; padding:5px;">
+            <input type="text" id="calc-display" readonly style="width:100%; background:#111; color:red; border:1px solid red; text-align:right; font-size:24px; padding:10px; margin-bottom:5px;">
             <div class="calc-grid">
-                ${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C'].map(k => `<button class="calc-btn" onclick="calcInput('${k}')">${k}</button>`).join('')}
+                ${['7','8','9','/','4','5','6','*','1','2','3','-','C','0','=','+'].map(k => `<button class="calc-btn" onclick="calcDo('${k}')">${k}</button>`).join('')}
             </div>
         </div>
     </div>
 
-    <div id="win-timer" class="spyder-window" style="bottom:60px; left:20px;">
-        <div class="window-header"><span>Timer</span><span class="close-win" onclick="closeTool('timer')">X</span></div>
+    <!-- Window: Timer -->
+    <div id="win-timer" class="spyder-window" style="bottom:60px; left:30px;">
+        <div class="window-header"><span>SpyderTimer</span><span class="close-win" onclick="closeSTool('timer')">X</span></div>
         <div class="window-body" style="text-align:center;">
-            <div id="timer-circle"><span id="timer-display">00:00</span></div>
-            <button onclick="setSpyderTimer()" style="margin-top:10px; background:red; border:none; padding:5px 15px; cursor:pointer;">Set Time</button>
+            <div id="timer-circle"><span id="timer-txt">00:00</span></div>
+            <button onclick="runSpyderTimer()" style="background:red; color:white; border:none; padding:10px 20px; cursor:pointer; font-weight:bold; margin-top:10px;">SET TIMER</button>
         </div>
     </div>
 
-    <div id="win-sw" class="spyder-window" style="top:20px; left:20px;">
-        <div class="window-header"><span>Stopwatch</span><span class="close-win" onclick="closeTool('sw')">X</span></div>
-        <div class="window-body" style="text-align:center;">
-            <div id="sw-display" style="font-size:36px; font-family:monospace; margin-bottom:10px;">00:00:00</div>
-            <button id="sw-start" style="background:green; color:white; border:none; padding:8px 20px; cursor:pointer;">Start</button>
-            <button id="sw-reset" style="background:gray; color:white; border:none; padding:8px 20px; cursor:pointer;">Restart</button>
+    <!-- Window: Camera (Screenshot/Video) -->
+    <div id="win-snip" class="spyder-window" style="top:50%; left:50%; transform:translate(-50%,-50%); width:300px;">
+        <div class="window-header"><span>SpyderCamera</span><span class="close-win" onclick="closeSTool('snip')">X</span></div>
+        <div class="window-body camera-ui">
+            <div class="camera-mode-toggle">
+                <span id="m-photo" class="mode-txt active" onclick="setCamMode('p')">PHOTO</span>
+                <span id="m-video" class="mode-txt" onclick="setCamMode('v')">VIDEO</span>
+            </div>
+            <div id="camera-shutter" class="camera-shutter" onclick="triggerCamera()"></div>
+            <button class="tool-btn" onclick="openSTool('gal')" style="width:100%; text-align:center;">📂 View Gallery</button>
         </div>
     </div>
 
-    <div id="win-snip" class="spyder-window" style="top:50%; left:50%; transform:translate(-50%,-50%);">
-        <div class="window-header"><span>Snipping Tool</span><span class="close-win" onclick="closeTool('snip')">X</span></div>
-        <div class="window-body snip-toolbar">
-            <button class="snip-btn" onclick="takeSS()">📸</button>
-            <button class="snip-btn" onclick="toggleRec()" id="rec-btn">⚪</button>
-            <button class="snip-btn" onclick="openGallery()">📂</button>
+    <!-- Window: Chat -->
+    <div id="win-chat" class="spyder-window" style="top:100px; left:100px; width:450px; height:550px;">
+        <div class="window-header"><span>SpyderChat</span><span class="close-win" onclick="closeSTool('chat')">X</span></div>
+        <div class="window-body" style="padding:0; height:500px;">
+            <iframe id="chat-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
 
-    <div id="win-chat" class="spyder-window" style="top:100px; left:100px; width:450px;">
-        <div class="window-header"><span>SpyderChat</span><span class="close-win" onclick="closeTool('chat')">X</span></div>
-        <div class="window-body">
-            <div id="rt-4de6c9c3bab0bfc0f88fcf07ad84e427"></div>
-        </div>
+    <!-- Window: Gallery -->
+    <div id="win-gal" class="spyder-window" style="top:50px; right:50px; width:350px;">
+        <div class="window-header"><span>SpyderGallery</span><span class="close-win" onclick="closeSTool('gal')">X</span></div>
+        <div class="window-body" id="gal-list" style="max-height:400px; overflow-y:auto;">No Captures.</div>
     </div>
     `;
 
-    document.body.insertAdjacentHTML('beforeend', ui);
+    document.body.insertAdjacentHTML('beforeend', toolHTML);
 
-    // --- Core Window Logic ---
-    window.openTool = (tool) => {
-        document.querySelectorAll('.spyder-window').forEach(w => w.style.display = 'none');
-        document.getElementById('win-' + tool).style.display = 'flex';
-        if(tool === 'chat' && !window.chatInited) {
-            let s = document.createElement('script'); s.src = "https://rumbletalk.com";
-            document.body.appendChild(s); window.chatInited = true;
-        }
+    // --- Tool Logic ---
+    window.openSTool = (id) => {
+        if(id !== 'gal') document.querySelectorAll('.spyder-window').forEach(w => w.style.display = 'none');
+        document.getElementById('win-' + id).style.display = 'flex';
+        if(id === 'chat') document.getElementById('chat-frame').src = "https://www.rumbletalk.com";
+        if(id === 'gal') loadSpyderGal();
     };
-    window.closeTool = (tool) => document.getElementById('win-' + tool).style.display = 'none';
+    window.closeSTool = (id) => document.getElementById('win-' + id).style.display = 'none';
 
     document.getElementById('spyder-tools-toggle').onclick = () => {
         const m = document.getElementById('spyder-tools-menu');
         m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    // --- Desktop Notification Helper ---
-    function notify(title, body) {
-        if (Notification.permission === "granted") new Notification(title, { body: body });
-        else alert(title + ": " + body);
-    }
-
-    // --- Calculator Engine ---
-    window.calcInput = (v) => {
+    // --- Calculator ---
+    window.calcDo = (v) => {
         const d = document.getElementById('calc-display');
-        if(v === '=') d.value = eval(d.value);
+        if(v === '=') try { d.value = eval(d.value); } catch(e) { d.value = "Error"; }
         else if(v === 'C') d.value = '';
         else d.value += v;
     };
 
-    // --- Timer Engine ---
-    let tInt;
-    window.setSpyderTimer = () => {
-        let sec = prompt("How many seconds?") || 0;
-        clearInterval(tInt);
-        tInt = setInterval(() => {
-            sec--;
-            let m = Math.floor(sec/60), s = sec%60;
-            document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            if(sec <= 0) { clearInterval(tInt); notify("SpyderTimer", "Timer has ended!"); }
+    // --- Timer ---
+    let ti;
+    window.runSpyderTimer = () => {
+        let s = prompt("Timer seconds:") || 0;
+        clearInterval(ti);
+        ti = setInterval(() => {
+            s--;
+            let min = Math.floor(s/60), sec = s%60;
+            document.getElementById('timer-txt').innerText = `${min}:${sec < 10 ? '0'+sec : sec}`;
+            if(s <= 0) { clearInterval(ti); alert("SpyderTimer: Done!"); }
         }, 1000);
     };
 
-    // --- Stopwatch Engine ---
-    let swInt, swStartAt = 0, swElapsed = 0;
-    document.getElementById('sw-start').onclick = function() {
-        if(this.innerText === "Start") {
-            this.innerText = "Stop"; this.style.background = "red";
-            swStartAt = Date.now() - swElapsed;
-            swInt = setInterval(() => {
-                swElapsed = Date.now() - swStartAt;
-                let ms = Math.floor((swElapsed % 1000) / 10), s = Math.floor((swElapsed / 1000) % 60), m = Math.floor(swElapsed / 60000);
-                document.getElementById('sw-display').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}:${ms.toString().padStart(2,'0')}`;
-            }, 10);
+    // --- Camera App (Screen/Audio Capture) ---
+    let curMode = 'p', recorder, chunks = [];
+    window.setCamMode = (m) => {
+        curMode = m;
+        document.getElementById('m-photo').classList.toggle('active', m === 'p');
+        document.getElementById('m-video').classList.toggle('active', m === 'v');
+    };
+
+    window.triggerCamera = async () => {
+        if(curMode === 'p') {
+            const stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: "browser" } });
+            const vid = document.createElement('video'); vid.srcObject = stream; await vid.play();
+            const canvas = document.createElement('canvas'); canvas.width = vid.videoWidth; canvas.height = vid.videoHeight;
+            canvas.getContext('2d').drawImage(vid, 0, 0);
+            saveToGal('img', canvas.toDataURL());
+            stream.getTracks().forEach(t => t.stop());
+            alert("Screenshot saved to Gallery!");
         } else {
-            this.innerText = "Start"; this.style.background = "green";
-            clearInterval(swInt);
+            const shutter = document.getElementById('camera-shutter');
+            if(shutter.classList.contains('recording')) {
+                recorder.stop(); shutter.classList.remove('recording');
+            } else {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                recorder = new MediaRecorder(stream);
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    saveToGal('vid', URL.createObjectURL(blob));
+                    chunks = []; stream.getTracks().forEach(t => t.stop());
+                    alert("Video recorded!");
+                };
+                recorder.start(); shutter.classList.add('recording');
+            }
         }
     };
-    document.getElementById('sw-reset').onclick = () => { swElapsed = 0; document.getElementById('sw-display').innerText = "00:00:00"; };
 
-    // --- Screen Capture Engine ---
-    let mediaRec, chunks = [];
-    window.takeSS = async () => {
-        const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-        const vid = document.createElement('video'); vid.srcObject = stream; await vid.play();
-        const canvas = document.createElement('canvas'); canvas.width = vid.videoWidth; canvas.height = vid.videoHeight;
-        canvas.getContext('2d').drawImage(vid, 0, 0);
-        const data = canvas.toDataURL();
-        let gallery = JSON.parse(localStorage.getItem('spyder_gallery') || '[]');
-        gallery.push({type:'img', data, time: Date.now()});
-        localStorage.setItem('spyder_gallery', JSON.stringify(gallery));
-        stream.getTracks().forEach(t => t.stop());
-        alert("Screenshot Captured!");
-    };
+    function saveToGal(type, data) {
+        let g = JSON.parse(localStorage.getItem('spyder_gal') || '[]');
+        g.push({ type, data, date: new Date().toLocaleString() });
+        localStorage.setItem('spyder_gal', JSON.stringify(g));
+    }
 
-    window.toggleRec = async () => {
-        const btn = document.getElementById('rec-btn');
-        if(btn.innerText === '🔴') { mediaRec.stop(); btn.innerText = '⚪'; return; }
-        const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-        mediaRec = new MediaRecorder(stream);
-        mediaRec.ondataavailable = e => chunks.push(e.data);
-        mediaRec.onstop = () => {
-            const blob = new Blob(chunks, {type:'video/webm'});
-            const url = URL.createObjectURL(blob);
-            window.open(url); // Auto-open for preview
-            let gallery = JSON.parse(localStorage.getItem('spyder_gallery') || '[]');
-            gallery.push({type:'vid', data: url, time: Date.now()});
-            localStorage.setItem('spyder_gallery', JSON.stringify(gallery));
-            chunks = [];
-        };
-        mediaRec.start(); btn.innerText = '🔴';
-    };
+    function loadSpyderGal() {
+        const g = JSON.parse(localStorage.getItem('spyder_gal') || '[]');
+        document.getElementById('gal-list').innerHTML = g.length ? g.map(i => `
+            <div style="border:1px solid #333; padding:10px; margin-bottom:10px; background:#111;">
+                <small>${i.date}</small><br>
+                ${i.type === 'img' ? `<img src="${i.data}" style="width:100%; cursor:pointer;" onclick="window.open('${i.data}')">` : 
+                `<button onclick="window.open('${i.data}')" style="width:100%; background:#222; border:1px solid red; color:#fff; cursor:pointer;">▶ Play Video</button>`}
+            </div>
+        `).join('') : "Gallery is empty.";
+    }
 
     // --- Drag Logic ---
     document.querySelectorAll('.window-header').forEach(h => {
         h.onmousedown = (e) => {
-            let w = h.parentElement; let ox = e.clientX - w.offsetLeft, oy = e.clientY - w.offsetTop;
-            document.onmousemove = (e) => { w.style.left = (e.clientX - ox) + "px"; w.style.top = (e.clientY - oy) + "px"; w.style.bottom = "auto"; };
+            let w = h.parentElement;
+            let ox = e.clientX - w.offsetLeft, oy = e.clientY - w.offsetTop;
+            document.onmousemove = (e) => {
+                w.style.left = (e.clientX - ox) + "px"; w.style.top = (e.clientY - oy) + "px";
+                w.style.bottom = "auto"; w.style.right = "auto";
+            };
             document.onmouseup = () => document.onmousemove = null;
         };
     });
