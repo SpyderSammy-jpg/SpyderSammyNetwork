@@ -247,13 +247,13 @@ function randRange(min, max) {
     <div id="bri-popup" class="spyder-popup" style="display:none;"><span>BRI</span><input type="range" class="thermometer-slider" id="bri-slider" min="10" max="100"></div>
 
     <div id="spyder-sidebar">
-        <h2 style="color:red;">Reminders <button id="add-rem-btn" style="background:red; border:none; cursor:pointer; color:black; font-weight:bold;">+</button></h2>
+        <h2 class="red-text">Reminders <button id="add-rem-btn" style="background:red; border:none; cursor:pointer; color:black; font-weight:bold;">+</button></h2>
         <div id="rem-list" style="border:1px solid #222; padding:10px; min-height:40px; font-size:13px;"></div>
         
-        <h2 style="color:red;">Countdown to School End</h2>
+        <h2 class="red-text">Countdown to School End</h2>
         <div id="school-countdown" style="font-size:16px; text-align:center; color:#ffff00; font-family:monospace; padding:10px; border:1px solid #222;"></div>
         
-        <h2 style="color:red;">SpyderCalendar</h2>
+        <h2 class="red-text">SpyderCalendar</h2>
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
             <button id="prev-mo" style="background:none; color:red; border:1px solid #333; cursor:pointer;"><</button>
             <span id="cal-header"></span>
@@ -269,25 +269,17 @@ function randRange(min, max) {
     let calDate = new Date();
     let rems = JSON.parse(localStorage.getItem('spyderRems') || '[]');
 
-    // --- Holiday & Festival Database with Greetings ---
+    // --- Holiday & Festival Database ---
     const festivals = {
         "1-1": { name: "New Year's Day", greet: "Happy New Year!" },
-        "1-7": { name: "Orthodox Christmas", greet: "Merry Orthodox Christmas!" },
-        "2-17": { name: "Lunar New Year", greet: "Happy Lunar New Year!" },
-        "2-18": { name: "Ash Wednesday", greet: "Have a Blessed Ash Wednesday!" },
         "2-24": { name: "SpyderSammy's Birthday", greet: "Happy Birthday SpyderSammy!" },
-        "3-3": { name: "Holi", greet: "Happy Holi!" },
         "3-17": { name: "St. Patrick's Day", greet: "Happy St. Patrick's Day!" },
         "3-19": { name: "Eid al-Fitr", greet: "Eid Mubarak!" },
-        "3-20": { name: "Eid al-Fitr", greet: "Eid Mubarak!" },
         "4-3": { name: "Good Friday", greet: "Have a Blessed Good Friday!" },
         "4-5": { name: "Easter", greet: "Happy Easter!" },
-        "5-1": { name: "Vesak Day", greet: "Happy Vesak Day!" },
-        "5-27": { name: "Eid al-Adha", greet: "Eid Mubarak!" },
         "6-14": { name: "Owner's Birthday", greet: "Happy Birthday Owner!" },
         "11-8": { name: "Diwali", greet: "Happy Diwali!" },
-        "12-25": { name: "Christmas Day", greet: "Merry Christmas!" },
-        "12-26": { name: "Kwanzaa", greet: "Happy Kwanzaa!" }
+        "12-25": { name: "Christmas Day", greet: "Merry Christmas!" }
     };
 
     // --- Greeting System ---
@@ -302,17 +294,13 @@ function randRange(min, max) {
     // --- Network Logic ---
     document.getElementById('wifi-btn').onclick = () => {
         const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        // Conditional Portnox Name detection
-        const isPortnox = window.location.hostname.includes("portnox") || navigator.onLine;
         let msg = `Status: ${navigator.onLine ? 'Online' : 'Offline'}\n`;
-        if (isPortnox) {
-            msg += `Name: PORTNOX_STUDENT\nSpeed: ${conn?.downlink || '---'} Mbps\n`;
-        }
+        msg += `Speed: ${conn?.downlink || '---'} Mbps\n`;
         msg += `Location: America/New Jersey/Jersey City/07302`;
         alert(msg);
     };
 
-    // --- Battery & Clock Logic ---
+    // --- Battery Logic ---
     if (navigator.getBattery) {
         navigator.getBattery().then(bat => {
             const up = () => {
@@ -324,18 +312,17 @@ function randRange(min, max) {
         });
     }
 
+    // --- Core Timer Engine ---
     let frames = 0, last = performance.now();
     function tick() {
         const now = new Date();
         document.getElementById('bar-time').innerText = now.toLocaleTimeString();
         document.getElementById('bar-date').innerText = now.toLocaleDateString();
 
-        // School Countdown
         const diff = new Date("2026-06-19T00:00:00") - now;
         const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
         document.getElementById('school-countdown').innerText = `${d}d ${h}h ${m}m ${s}s`;
 
-        // Alarms with Auto-Delete
         const timeKey = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
         rems.forEach((r, i) => {
             if(r.time === timeKey && !r.done) {
@@ -377,7 +364,7 @@ function randRange(min, max) {
         document.getElementById('cal-box').innerHTML = html;
     }
 
-    // --- UI Listeners ---
+    // --- Event Listeners ---
     document.getElementById('notif-bell-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('spyder-sidebar').classList.toggle('open'); };
     document.getElementById('vol-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('vol-popup').style.display='flex'; };
     document.getElementById('bri-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('bri-popup').style.display='flex'; };
@@ -388,7 +375,7 @@ function randRange(min, max) {
     };
 
     window.delRem = (id) => { if(confirm("Delete?")) { rems = rems.filter(r => r.id !== id); localStorage.setItem('spyderRems', JSON.stringify(rems)); renderRems(); }};
-    function renderRems() { document.getElementById('rem-list').innerHTML = rems.map(r => `<div style="display:flex; justify-content:space-between;"><span><input type="checkbox" onchange="delRem(${r.id})"> ${r.title}</span><span style="color:red;">${r.time}</span></div>`).join('') || "None"; }
+    function renderRems() { document.getElementById('rem-list').innerHTML = rems.map(r => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span><input type="checkbox" onchange="delRem(${r.id})"> ${r.title}</span><span style="color:red;">${r.time}</span></div>`).join('') || "None"; }
     
     document.getElementById('prev-mo').onclick = () => { calDate.setMonth(calDate.getMonth()-1); drawCal(); };
     document.getElementById('next-mo').onclick = () => { calDate.setMonth(calDate.getMonth()+1); drawCal(); };
