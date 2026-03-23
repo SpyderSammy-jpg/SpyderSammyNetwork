@@ -169,16 +169,14 @@ document.addEventListener("DOMContentLoaded", event => {
 // Splash texts
 const SplashT = [
   "Thanks for using SpyderSammyUI Proxy",
-  "This is dedicated for Homeroom 222 of the Frank R. Conwell Middle School 4",
-  "Made by Sharvesh Vijayanand (SpyderSammy)",
+  "Made by SpyderSammy",
   "Check out my new SpyderSammy Proxy! :)",
   "SpyderSammy is a high-speed proxy designed to bypass school filters.",
   "All hail SpyderSammy",
   "Check out the settings page",
   "Don't forget to play admin abuse this week!",
-  "Contact 208419@jcpsnj.org for updates, requests, errors and new url's",
+  "Contact SpyderSammy-jpg on github for updates, requests, errors and new url's",
   "Tung Tung Tung Sahur!",
-  "Announcement: Mohanesh's favorite word is: TESTICLES!",
 ];
 
 let SplashI = Math.floor(Math.random() * SplashT.length);
