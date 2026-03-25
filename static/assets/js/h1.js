@@ -738,3 +738,58 @@ window.closeSpyderApp = function() {
 window.minSpyderApp = function() {
     document.getElementById('spyder-app-win').style.display = 'none';
 };
+/* --- SPYDER-OS: FULL-SCREEN APP SWAPPER --- */
+const spyderApps = {
+    eagler: { url: "https://takaiwebite.neocities.org", name: "Minecraft" },
+    spyder: { url: "HOME", name: "SpyderSammy" }, 
+    nyx: { url: "https://222-bypassnetwork.vercel.app", name: "Nyx" },
+    settings: { url: window.location.origin + "/c", name: "Settings" } 
+};
+
+(function initSpyderOS() {
+    // 1. Create the Full-Screen App Layer
+    const appLayer = document.createElement('div');
+    appLayer.id = 'spyder-app-layer';
+    appLayer.style = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999; display:none;";
+    appLayer.innerHTML = `<iframe id="spyder-os-frame" src="" style="width:100%; height:100%; border:none;"></iframe>`;
+    document.body.appendChild(appLayer);
+
+    // 2. Inject the App Circles into your Taskbar
+    const taskBar = document.getElementById('spyder-bar');
+    if (taskBar) {
+        const centerApps = document.createElement('div');
+        centerApps.style = "position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center;";
+        centerApps.innerHTML = `
+            <div class="app-circle" onclick="launchSpyderApp('eagler')">⛏️</div>
+            <div class="app-circle" onclick="launchSpyderApp('spyder')">🕷️</div>
+            <div class="app-circle" onclick="launchSpyderApp('nyx')">🐦</div>
+            <div class="app-circle" onclick="launchSpyderApp('settings')">⚙️</div>
+        `;
+        taskBar.appendChild(centerApps);
+    }
+})();
+
+window.launchSpyderApp = function(key) {
+    const app = spyderApps[key];
+    const layer = document.getElementById('spyder-app-layer');
+    const frame = document.getElementById('spyder-os-frame');
+    
+    if (key === 'spyder') {
+        layer.style.display = 'none'; // Show original homepage
+        frame.src = '';
+    } else {
+        layer.style.display = 'block'; // Show app iframe
+        frame.src = app.url;
+    }
+};
+
+// Search Bar Redirect Logic
+const sForm = document.getElementById("fv");
+if (sForm) {
+    sForm.onsubmit = (e) => {
+        e.preventDefault();
+        const val = document.getElementById("input").value;
+        localStorage.setItem("autoSearch", val);
+        window.location.href = "/tabs.html";
+    };
+}
