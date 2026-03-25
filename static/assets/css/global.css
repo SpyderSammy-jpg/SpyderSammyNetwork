@@ -301,3 +301,33 @@ html, body, #particles-js, .main, .center, .container {
 #spyder-app-layer {
     z-index: 9999 !important; /* Below the Taskbar and Nav */
 }
+/* --- APP OVERLAP & PERSISTENCE FIXES --- */
+.app-circle {
+    width: 32px; height: 32px; background: #000; border: 2px solid #ff0000;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; transition: 0.2s;
+}
+.app-circle:hover { 
+    background: #ff0000; transform: scale(1.1); box-shadow: 0 0 10px #ff0000; 
+}
+
+/* Ensure Taskbar and Nav stay above the app iframe layer */
+#spyder-bar, .f-nav {
+    z-index: 100000 !important; 
+    position: fixed !important;
+}
+
+#spyder-bar {
+    background: rgba(0,0,0,1) !important;
+    display: flex !important;
+}
+
+/* Ensure navbar links/icons don't get covered */
+.f-nav a, .f-nav img {
+    z-index: 100001 !important;
+    visibility: visible !important;
+}
+
+#spyder-app-layer {
+    z-index: 9998 !important; /* Sits behind the Taskbar/Nav */
+}
