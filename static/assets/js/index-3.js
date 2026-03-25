@@ -83,14 +83,16 @@ document.querySelectorAll('.game-card, .app-card, a[href*="go"]').forEach(link =
         }
     });
 });
-/* --- REDIRECT GAMES/APPS TO TABS --- */
-document.addEventListener('click', function(e) {
-    const link = e.target.closest('a');
-    if (link && (link.href.includes('games') || link.href.includes('apps'))) {
-        if (!link.href.endsWith('.html')) {
+/* --- HOME SEARCH REDIRECT --- */
+const spyderForm = document.getElementById("fv");
+const spyderInput = document.getElementById("input");
+if (spyderForm && spyderInput) {
+    spyderForm.addEventListener("submit", (e) => {
+        // Only redirect if searching from the Home page
+        if (!window.location.pathname.includes("tabs.html")) {
             e.preventDefault();
-            localStorage.setItem("autoSearch", link.href);
+            localStorage.setItem("spyderSearch", spyderInput.value);
             window.location.href = "/tabs.html";
         }
-    }
-});
+    });
+}
