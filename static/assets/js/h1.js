@@ -793,3 +793,70 @@ if (sForm) {
         window.location.href = "/tabs.html";
     };
 }
+/* --- SPYDER-OS: PERSISTENT UI & APP SWAPPING --- */
+const spyderApps = {
+    eagler: { url: "https://takaiwebite.neocities.org", name: "Minecraft" },
+    spyder: { url: "HOME", name: "SpyderSammy" }, 
+    nyx: { url: "https://222-bypassnetwork.vercel.app", name: "Nyx" },
+    settings: { url: window.location.origin + "/c", name: "Settings" } 
+};
+
+(function initSpyderOS() {
+    // 1. Create the App Overlay (Hidden)
+    if (!document.getElementById('spyder-app-layer')) {
+        const appLayer = document.createElement('div');
+        appLayer.id = 'spyder-app-layer';
+        appLayer.style = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:9999; display:none;";
+        appLayer.innerHTML = `<iframe id="spyder-os-frame" src="" style="width:100%; height:100%; border:none;"></iframe>`;
+        document.body.appendChild(appLayer);
+    }
+
+    // 2. Inject Circles into EXISTING bar (Preserves Tools/Icons)
+    const taskBar = document.getElementById('spyder-bar');
+    if (taskBar && !document.querySelector('.task-center')) {
+        const centerApps = document.createElement('div');
+        centerApps.className = "task-center";
+        // Absolute centering ensures it doesn't push your tools away
+        centerApps.style = "position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; height:100%; z-index:10010;";
+        centerApps.innerHTML = `
+            <div class="app-circle" onclick="launchSpyderApp('eagler')">⛏️</div>
+            <div class="app-circle" onclick="launchSpyderApp('spyder')">🕷️</div>
+            <div class="app-circle" onclick="launchSpyderApp('nyx')">🐦</div>
+            <div class="app-circle" onclick="launchSpyderApp('settings')">⚙️</div>
+        `;
+        taskBar.appendChild(centerApps);
+    }
+})();
+
+window.launchSpyderApp = function(key) {
+    const app = spyderApps[key];
+    const layer = document.getElementById('spyder-app-layer');
+    const frame = document.getElementById('spyder-os-frame');
+    const homeContent = document.getElementById('particles-js');
+    
+    if (key === 'spyder') {
+        layer.style.display = 'none';
+        frame.src = '';
+        if (homeContent) homeContent.style.display = 'block';
+    } else {
+        layer.style.display = 'block';
+        frame.src = app.url;
+        if (homeContent) homeContent.style.display = 'none';
+    }
+};
+
+// Search to Tabs Landing Logic
+window.addEventListener('load', () => {
+    if (window.location.pathname.includes("tabs.html")) {
+        const pending = localStorage.getItem("spyderSearch") || localStorage.getItem("autoSearch");
+        if (pending) {
+            localStorage.removeItem("spyderSearch");
+            localStorage.removeItem("autoSearch");
+            const tabInput = document.querySelector(".tab-search-input") || document.getElementById("input");
+            if (tabInput) {
+                tabInput.value = pending;
+                tabInput.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true}));
+            }
+        }
+    }
+});
