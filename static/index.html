@@ -14,14 +14,12 @@
   <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
 
   <style>
-    /* 1. Background - Removed !important so Admin Edit works */
+    /* 1. Global Reset */
     html, body, #particles-js, .main, .center {
-      background-color: #000;
-      background-image: none;
-      transition: background-color 0.4s ease;
+      background: #000 !important;
+      background-color: #000 !important;
     }
 
-    /* 2. Title Styling */
     .title {
       color: #ff0000 !important;
       -webkit-text-stroke: 1.5px #ffff00;
@@ -30,41 +28,47 @@
       user-select: none;
     }
 
-    /* 3. Admin Elements Style */
+    /* 2. Admin System Popups */
     #admin-auth-popup, #edit-popup {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: #000; border: 2px solid #ff0000; padding: 25px; z-index: 10005;
-      color: #ff0000; font-family: sans-serif; text-align: center; border-radius: 8px;
+      color: #ff0000; font-family: sans-serif; text-align: center; border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255,0,0,0.5);
     }
     #admin-auth-popup input, #edit-popup input {
-      display: block; margin: 10px auto; padding: 8px; background: #111; border: 1px solid #ff0000; color: #fff;
+      display: block; margin: 10px auto; padding: 10px; background: #111; border: 1px solid #ff0000; color: #fff; width: 220px;
     }
 
-    /* Crown Icon - Styled to match your Tools Icon */
+    /* 3. Crown Icon - Matching the Wrench Tool Box */
     #crown-btn {
-      display: none; position: fixed; top: 110px; right: 20px; z-index: 10000;
-      cursor: pointer; border: 1px solid #ff0000; border-radius: 8px; padding: 8px;
-      background: rgba(0,0,0,0.8); transition: right 0.3s ease;
+      display: none; position: fixed; 
+      top: 200px; /* Positioned exactly under the tools icon */
+      right: 18px; 
+      z-index: 10000;
+      cursor: pointer; 
+      border: 1.5px solid #ff0000; 
+      border-radius: 8px; 
+      padding: 6px;
+      background: rgba(20, 20, 20, 0.9); 
+      transition: right 0.3s ease;
     }
-    #crown-btn img { width: 30px; height: 30px; filter: drop-shadow(0 0 5px red); }
+    #crown-btn img { width: 34px; height: 34px; filter: drop-shadow(0 0 2px red); }
 
-    /* Admin Dropdown Menu */
+    /* Admin Dropdown */
     #admin-menu {
-      display: none; position: fixed; top: 165px; right: 20px; background: #000;
-      border: 1px solid #ff0000; z-index: 10000; width: 140px; border-radius: 5px;
+      display: none; position: fixed; top: 260px; right: 18px; background: #000;
+      border: 2px solid #ff0000; z-index: 10000; width: 140px; border-radius: 5px;
     }
-    .admin-opt { padding: 12px; color: white; cursor: pointer; border-bottom: 1px solid #333; text-align: center; font-family: sans-serif; }
+    .admin-opt { padding: 12px; color: white; cursor: pointer; border-bottom: 1px solid #333; text-align: center; font-family: sans-serif; font-size: 14px; }
     .admin-opt:hover { background: #ff0000; color: black; }
 
-    /* Console */
+    /* Admin Console */
     #admin-console {
-      display: none; position: fixed; bottom: 20px; left: 20px; background: #000;
+      display: none; position: fixed; bottom: 80px; left: 20px; background: #000;
       border: 2px solid #ff0000; padding: 10px; z-index: 10001;
     }
-    #admin-console input { background: #000; color: #0f0; border: none; outline: none; width: 250px; font-family: monospace; }
+    #admin-console input { background: #000; color: #0f0; border: none; outline: none; width: 300px; font-family: monospace; font-size: 16px; }
   </style>
-
-  <script async src="https://googlesyndication.com" crossorigin="anonymous"></script>
 </head>
 
 <body class="center">
@@ -72,7 +76,7 @@
 
   <div id="particles-js">
     <div class="main">
-      <h1 class="title">SpyderSammy</h1>
+      <h1 class="title" id="main-title">SpyderSammy</h1>
       <p id="splash"></p>
       <div class="search-container">
         <form id="fv" method="POST">
@@ -82,12 +86,12 @@
     </div>
   </div>
 
-  <!-- Admin UI Elements -->
+  <!-- Popups -->
   <div id="admin-auth-popup">
-    <h2>Admin Login</h2>
+    <h2 style="margin-bottom:20px;">Admin Login</h2>
     <input type="text" id="adm-user" placeholder="Username">
     <input type="password" id="adm-pass" placeholder="Password">
-    <button onclick="checkAdmin()" style="background:#ff0000; border:none; padding:10px 20px; cursor:pointer;">Login</button>
+    <button onclick="checkAdmin()" style="background:#ff0000; color:black; border:none; padding:12px 25px; cursor:pointer; font-weight:bold; border-radius:5px; margin-top:10px;">Login</button>
   </div>
 
   <div id="crown-btn" onclick="toggleAdminMenu()">
@@ -100,18 +104,18 @@
   </div>
 
   <div id="admin-console">
-    <span onclick="this.parentElement.style.display='none'" style="color:red; float:right; cursor:pointer;">X</span>
-    <input type="text" id="console-input" placeholder="Type command..." onkeydown="handleCmd(event)">
+    <span onclick="this.parentElement.style.display='none'" style="color:red; float:right; cursor:pointer; font-weight:bold;">[X]</span>
+    <input type="text" id="console-input" placeholder="Enter Command..." onkeydown="handleCmd(event)">
   </div>
 
   <div id="edit-popup">
-    <h3>Global Settings</h3>
-    <p>Background Color</p>
-    <input type="color" id="bg-picker" style="width:100%">
-    <p>Music (YouTube URL)</p>
-    <input type="text" id="yt-url" placeholder="://youtube.com...">
-    <button onclick="saveGlobal()" style="background:#ff0000; color:black; border:none; padding:10px; cursor:pointer;">Apply & Save</button>
-    <button onclick="toggleEdit()" style="background:#444; color:white; border:none; padding:10px; margin-left:5px; cursor:pointer;">Close</button>
+    <h3>Admin Customization</h3>
+    <p style="font-size:12px; margin-bottom:5px;">SITE NAME</p>
+    <input type="text" id="name-input" placeholder="e.g. Sharvesh's Hub">
+    <p style="font-size:12px; margin-bottom:5px;">SPLASH MESSAGE</p>
+    <input type="text" id="splash-input" placeholder="e.g. Hello Admin!">
+    <button onclick="saveAdminEdits()" style="background:#ff0000; color:black; border:none; padding:12px; cursor:pointer; width:100%; font-weight:bold; border-radius:5px;">Save Changes</button>
+    <button onclick="toggleEdit()" style="background:#333; color:white; border:none; padding:10px; margin-top:10px; cursor:pointer; width:100%; border-radius:5px;">Cancel</button>
   </div>
 
   <!-- Scripts -->
@@ -122,9 +126,11 @@
   <script src="/assets/js/m1.js"></script>
 
   <script>
-    // 1. Triple Click Logic
     let clickCount = 0;
-    document.querySelector('.title').addEventListener('click', () => {
+    const titleEl = document.getElementById('main-title');
+
+    // 1. Triple Click to Login
+    titleEl.addEventListener('click', () => {
       clickCount++;
       if (clickCount === 3) {
         document.getElementById('admin-auth-popup').style.display = 'block';
@@ -133,7 +139,6 @@
       setTimeout(() => { clickCount = 0; }, 800);
     });
 
-    // 2. Admin Functions
     function checkAdmin() {
       if (document.getElementById('adm-user').value === "Sharvesh" && document.getElementById('adm-pass').value === "00010698") {
         localStorage.setItem('isAdmin', 'true');
@@ -141,6 +146,7 @@
       }
     }
 
+    // 2. Menu Controls
     function toggleAdminMenu() {
       const m = document.getElementById('admin-menu');
       m.style.display = (m.style.display === 'block') ? 'none' : 'block';
@@ -149,6 +155,7 @@
     function toggleConsole() {
       document.getElementById('admin-console').style.display = 'block';
       document.getElementById('admin-menu').style.display = 'none';
+      document.getElementById('console-input').focus();
     }
 
     function toggleEdit() {
@@ -157,6 +164,7 @@
       document.getElementById('admin-menu').style.display = 'none';
     }
 
+    // 3. Command Console Logic
     function handleCmd(e) {
       if (e.key === 'Enter') {
         const cmd = e.target.value.trim();
@@ -167,38 +175,35 @@
       }
     }
 
-    function saveGlobal() {
-      const color = document.getElementById('bg-picker').value;
-      let url = document.getElementById('yt-url').value;
-      if (url.includes('youtube.com')) url = url.replace('youtube.com', 'yout-ube.com');
-      localStorage.setItem('globalBG', color);
-      localStorage.setItem('globalMusic', url);
-      applySettings();
+    // 4. Save Custom Edits
+    function saveAdminEdits() {
+      const newName = document.getElementById('name-input').value.trim();
+      const newSplash = document.getElementById('splash-input').value.trim();
+      if (newName) localStorage.setItem('customName', newName);
+      if (newSplash) localStorage.setItem('customSplash', newSplash);
+      applyAdminSettings();
       toggleEdit();
     }
 
-    function applySettings() {
-      const color = localStorage.getItem('globalBG');
-      if (color) {
-        ['html', 'body', '#particles-js', '.main'].forEach(sel => {
-          const el = document.querySelector(sel);
-          if (el) el.style.backgroundColor = color;
-        });
-      }
+    function applyAdminSettings() {
+      const savedName = localStorage.getItem('customName');
+      const savedSplash = localStorage.getItem('customSplash');
+      if (savedName) titleEl.innerText = savedName;
+      if (savedSplash) document.getElementById('splash').innerText = savedSplash;
       if (localStorage.getItem('isAdmin') === 'true') {
         document.getElementById('crown-btn').style.display = 'block';
       }
     }
 
-    window.onload = applySettings;
+    window.onload = applyAdminSettings;
 
-    // Sidebar Shift Logic
+    // 5. Sidebar Shift Logic - Keeps Crown moving with sidebar
     setInterval(() => {
       const side = document.querySelector('.sidebar');
-      const offset = (side && side.style.display !== 'none') ? '325px' : '20px';
+      const offset = (side && side.style.display !== 'none') ? '325px' : '18px';
       document.getElementById('crown-btn').style.right = offset;
       document.getElementById('admin-menu').style.right = offset;
-    }, 300);
+    }, 400);
   </script>
 </body>
 </html>
