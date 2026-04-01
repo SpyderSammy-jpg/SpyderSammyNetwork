@@ -5,7 +5,7 @@
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="shortcut icon" id="tab-favicon" href="https://gstatic.com" />
+  <link rel="shortcut icon" id="tab-favicon" href="https://ssl.gstatic.com" />
   <title id="t">Home - Classroom</title>
 
   <!-- External Styles -->
@@ -13,60 +13,57 @@
   <link rel="stylesheet" href="/assets/css/h.css?v=01" />
   <link rel="stylesheet" href="/assets/css/nav.css?v=01" />
 
-  <!-- Google Fonts for Real Themes -->
+  <!-- Google Fonts for Real Decorative Themes -->
   <link href="https://googleapis.com" rel="stylesheet">
 
   <style>
+    /* 1. Global Background - Removed !important to keep Taskbar/Navbar visible */
     html, body, #particles-js, .main, .center {
-      background: #000 !important;
-      background-color: #000 !important;
+      background: #000;
+      background-color: #000;
     }
 
-    /* Core Title Style */
+    /* 2. Title Styling */
     .title {
       color: #ff0000 !important;
       -webkit-text-stroke: 1.5px #ffff00;
       font-weight: 900;
       cursor: pointer;
       user-select: none;
-      font-size: 4rem;
-      transition: 0.5s all;
+      transition: 0.4s all;
     }
 
     /* THEMED FONT CLASSES */
-    .f-default { font-family: sans-serif; }
     .f-easter { font-family: 'Fredoka One', cursive; color: #ff99cc !important; -webkit-text-stroke: 1.5px #fff; }
-    .f-halloween { font-family: 'Creepster', system-ui; color: #ff4500 !important; -webkit-text-stroke: 1px #000; letter-spacing: 5px; }
+    .f-halloween { font-family: 'Creepster', cursive; color: #ff4500 !important; -webkit-text-stroke: 1px #000; letter-spacing: 3px; }
     .f-birthday { font-family: 'Bungee Shade', cursive; color: #00ffff !important; -webkit-text-stroke: 1.5px #ff00ff; }
-    .f-christmas { font-family: 'Mountains of Christmas', cursive; color: #2e8b57 !important; -webkit-text-stroke: 1.5px #ff0000; font-weight: bold; }
+    .f-christmas { font-family: 'Mountains of Christmas', cursive; color: #2e8b57 !important; -webkit-text-stroke: 1.5px #ff0000; }
 
-    /* Admin Popups */
+    /* 3. Admin Elements Style */
     #admin-auth-popup, #edit-popup {
       display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: #000; border: 2.5px solid #ff0000; padding: 25px; z-index: 10005;
-      color: #ff0000; font-family: sans-serif; text-align: center; border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255,0,0,0.6);
+      background: #000; border: 2px solid #ff0000; padding: 25px; z-index: 10005;
+      color: #ff0000; font-family: sans-serif; text-align: center; border-radius: 8px;
     }
     #admin-auth-popup input, #edit-popup input, #edit-popup select {
-      display: block; margin: 12px auto; padding: 10px; background: #111; border: 1.5px solid #ff0000; color: #fff; width: 240px;
+      display: block; margin: 10px auto; padding: 8px; background: #111; border: 1px solid #ff0000; color: #fff; width: 220px;
     }
 
-    /* The "A" Box */
-    #admin-a-btn {
-      display: none; position: fixed; top: 155px; right: 20px; z-index: 10000;
-      cursor: pointer; border: 2px solid #ff0000; border-radius: 8px; 
-      width: 44px; height: 44px; line-height: 44px;
-      background: rgba(15, 15, 15, 0.95); text-align: center;
-      color: #ff0000; font-family: sans-serif; font-weight: 900; font-size: 26px;
-      transition: right 0.3s ease; box-shadow: 0 0 10px rgba(255,0,0,0.3);
+    /* Crown Icon - Matches Tools Box */
+    #crown-btn {
+      display: none; position: fixed; top: 120px; right: 20px; z-index: 10000;
+      cursor: pointer; border: 1px solid #ff0000; border-radius: 8px; padding: 8px;
+      background: rgba(0,0,0,0.8); transition: right 0.3s ease;
     }
+    #crown-btn img { width: 30px; height: 30px; filter: drop-shadow(0 0 5px red); }
 
+    /* Admin Dropdown Menu */
     #admin-menu {
-      display: none; position: fixed; top: 215px; right: 20px; background: #000;
-      border: 2px solid #ff0000; z-index: 10000; width: 150px; border-radius: 5px;
+      display: none; position: fixed; top: 175px; right: 20px; background: #000;
+      border: 2px solid #ff0000; z-index: 10000; width: 140px; border-radius: 5px;
     }
-    .admin-opt { padding: 14px; color: white; cursor: pointer; border-bottom: 1px solid #333; text-align: center; font-family: sans-serif; font-size: 14px; }
-    .admin-opt:hover { background: #ff0000; color: black; font-weight: bold; }
+    .admin-opt { padding: 12px; color: white; cursor: pointer; border-bottom: 1px solid #333; text-align: center; font-family: sans-serif; }
+    .admin-opt:hover { background: #ff0000; color: black; }
   </style>
 </head>
 
@@ -76,7 +73,7 @@
   <div id="particles-js">
     <div class="main">
       <h1 class="title" id="main-title">SpyderSammy</h1>
-      <p id="splash" style="color:#666; font-family:monospace;"></p>
+      <p id="splash"></p>
       <div class="search-container">
         <form id="fv" method="POST">
           <input id="input" class="truncate" placeholder="Searching doesn't work..." type="text" />
@@ -85,46 +82,55 @@
     </div>
   </div>
 
+  <!-- Popups -->
   <div id="admin-auth-popup">
-    <h2 style="margin-top:0;">Admin Login</h2>
+    <h2>Admin Login</h2>
     <input type="text" id="adm-user" placeholder="Username">
     <input type="password" id="adm-pass" placeholder="Password">
-    <button onclick="checkAdmin()" style="background:#ff0000; border:none; padding:12px; cursor:pointer; font-weight:bold; width:100%; border-radius:5px;">ENTER</button>
+    <button onclick="checkAdmin()" style="background:#ff0000; border:none; padding:10px 20px; cursor:pointer; font-weight:bold;">Login</button>
   </div>
 
-  <div id="admin-a-btn" onclick="toggleAdminMenu()">A</div>
+  <div id="crown-btn" onclick="toggleAdminMenu()">
+    <img src="https://icons8.com" alt="Crown">
+  </div>
 
   <div id="admin-menu">
     <div class="admin-opt" onclick="toggleConsole()">Console</div>
     <div class="admin-opt" onclick="toggleEdit()">Edit</div>
-    <div class="admin-opt" onclick="logoutAdmin()" style="color:red; font-weight:bold;">LOGOUT</div>
+    <div class="admin-opt" onclick="logoutAdmin()" style="color:red; font-weight:bold;">Logout</div>
   </div>
 
   <div id="edit-popup">
-    <h3 style="margin-top:0;">Site Customization</h3>
-    <input type="text" id="name-input" placeholder="Site Title (Name Selector)">
+    <h3>Admin Customization</h3>
+    <input type="text" id="name-input" placeholder="Custom Site Name">
     <select id="font-select">
-      <option value="f-default">Default (Standard)</option>
-      <option value="f-easter">Easter (Bubbley/Pink)</option>
-      <option value="f-halloween">Halloween (Spooky/Creepy)</option>
-      <option value="f-birthday">Birthday (Arcade/Festive)</option>
-      <option value="f-christmas">Christmas (Script/Holiday)</option>
+      <option value="">Default Font</option>
+      <option value="f-easter">Easter Theme</option>
+      <option value="f-halloween">Halloween Theme</option>
+      <option value="f-birthday">Birthday Theme</option>
+      <option value="f-christmas">Christmas Theme</option>
     </select>
-    <input type="text" id="yt-url" placeholder="YouTube URL (Auto-Format)">
-    <input type="text" id="splash-input" placeholder="Custom Splash Text">
-    <button onclick="saveAdminEdits()" style="background:#ff0000; color:black; border:none; padding:12px; cursor:pointer; width:100%; font-weight:bold; border-radius:5px; margin-top:10px;">SAVE & APPLY</button>
-    <button onclick="toggleEdit()" style="background:#333; color:white; border:none; padding:10px; margin-top:8px; cursor:pointer; width:100%; border-radius:5px;">CANCEL</button>
+    <input type="text" id="yt-url" placeholder="YouTube URL">
+    <input type="text" id="splash-input" placeholder="Splash Message">
+    <button onclick="saveAdminEdits()" style="background:#ff0000; color:black; border:none; padding:10px; cursor:pointer; width:100%; font-weight:bold;">Save Changes</button>
+    <button onclick="toggleEdit()" style="background:#333; color:white; border:none; padding:10px; margin-top:5px; cursor:pointer; width:100%;">Close</button>
   </div>
 
-  <div id="admin-console" style="display:none; position:fixed; bottom:20px; left:20px; background:#000; border:2px solid red; padding:12px; z-index:10001; border-radius:5px;">
-    <input type="text" id="console-input" placeholder="root@admin:~# command" onkeydown="handleCmd(event)" style="background:#000; color:#0f0; border:none; outline:none; width:300px; font-family:monospace;">
+  <div id="admin-console" style="display:none; position:fixed; bottom:20px; left:20px; background:#000; border:2px solid red; padding:10px; z-index:10001;">
+    <input type="text" id="console-input" placeholder="Command..." onkeydown="handleCmd(event)" style="background:#000; color:#0f0; border:none; outline:none; width:250px; font-family:monospace;">
   </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/index-3.js"></script>
+  <script src="/assets/js/h1.js"></script>
+  <script src="./assets/mathematics/bundle.js?v=2025-04-15"></script>
+  <script src="./assets/mathematics/config.js?v=2025-04-15"></script>
+  <script src="/assets/js/m1.js"></script>
 
   <script>
     let clickCount = 0;
     const titleEl = document.getElementById('main-title');
 
-    // 1. Triple Click Logic
     titleEl.addEventListener('click', () => {
       clickCount++;
       if (clickCount === 3) { document.getElementById('admin-auth-popup').style.display = 'block'; clickCount = 0; }
@@ -143,7 +149,6 @@
       location.reload();
     }
 
-    // 2. Menu Logic
     function toggleAdminMenu() {
       const m = document.getElementById('admin-menu');
       m.style.display = (m.style.display === 'block') ? 'none' : 'block';
@@ -159,67 +164,58 @@
       const c = document.getElementById('admin-console');
       c.style.display = (c.style.display === 'block') ? 'none' : 'block';
       document.getElementById('admin-menu').style.display = 'none';
-      document.getElementById('console-input').focus();
     }
 
-    // 3. Command Handling
-    function handleCmd(e) {
-      if (e.key === 'Enter') {
-        const cmd = e.target.value.toLowerCase().trim();
-        if (cmd === '/refresh') location.reload();
-        if (cmd === '/home') window.location.href = '/';
-        if (cmd === '/close') window.close();
-        e.target.value = '';
-      }
-    }
-
-    // 4. Save and Persistence
     function saveAdminEdits() {
-      const newName = document.getElementById('name-input').value.trim();
-      const newFont = document.getElementById('font-select').value;
-      const newSplash = document.getElementById('splash-input').value.trim();
-      let newMusic = document.getElementById('yt-url').value.trim();
+      const n = document.getElementById('name-input').value;
+      const f = document.getElementById('font-select').value;
+      const s = document.getElementById('splash-input').value;
+      let m = document.getElementById('yt-url').value;
 
-      if (newName) localStorage.setItem('cName', newName);
-      localStorage.setItem('cFont', newFont);
-      if (newSplash) localStorage.setItem('cSplash', newSplash);
-      if (newMusic.includes('youtube.com')) {
-        newMusic = newMusic.replace('youtube.com', 'yout-ube.com');
-        localStorage.setItem('cMusic', newMusic);
+      if (n) localStorage.setItem('cName', n);
+      localStorage.setItem('cFont', f);
+      if (s) localStorage.setItem('cSplash', s);
+      if (m.includes('youtube.com')) {
+        m = m.replace('youtube.com', 'yout-ube.com');
+        localStorage.setItem('cMusic', m);
       }
-      
       applyAdminSettings();
       toggleEdit();
     }
 
     function applyAdminSettings() {
-      const sName = localStorage.getItem('cName');
-      const sFont = localStorage.getItem('cFont');
-      const sSplash = localStorage.getItem('cSplash');
-      const sMusic = localStorage.getItem('cMusic');
+      const name = localStorage.getItem('cName');
+      const font = localStorage.getItem('cFont');
+      const splash = localStorage.getItem('cSplash');
+      const music = localStorage.getItem('cMusic');
 
-      if (sName) titleEl.innerText = sName;
-      if (sFont) titleEl.className = "title " + sFont;
-      if (sSplash) document.getElementById('splash').innerText = sSplash;
-      
-      if (localStorage.getItem('isAdmin') === 'true') {
-        document.getElementById('admin-a-btn').style.display = 'block';
+      if (name) titleEl.innerText = name;
+      if (font) titleEl.className = "title " + font;
+      if (splash) document.getElementById('splash').innerText = splash;
+      if (localStorage.getItem('isAdmin') === 'true') document.getElementById('crown-btn').style.display = 'block';
+
+      if (music && !window.musicPlayed) {
+        const audio = new Audio(music);
+        document.body.addEventListener('click', () => { audio.play(); window.musicPlayed = true; }, {once: true});
       }
-      
-      if (sMusic && !window.musicActive) {
-        const audio = new Audio(sMusic);
-        document.body.addEventListener('click', () => { audio.play(); window.musicActive = true; }, {once: true});
+    }
+
+    function handleCmd(e) {
+      if (e.key === 'Enter') {
+        const val = e.target.value;
+        if (val === '/refresh') location.reload();
+        if (val === '/home') window.location.href = '/';
+        if (val === '/close') window.close();
+        e.target.value = '';
       }
     }
 
     window.onload = applyAdminSettings;
 
-    // 5. Alignment with Sidebar
     setInterval(() => {
       const side = document.querySelector('.sidebar');
-      const isVisible = (side && side.style.display !== 'none' && side.offsetWidth > 0);
-      const offset = isVisible ? '330px' : '20px';
-      document.getElementById('admin-a-btn').style.right = offset;
+      const offset = (side && side.style.display !== 'none') ? '325px' : '20px';
+      document.getElementById('crown-btn').style.right = offset;
       document.getElementById('admin-menu').style.right = offset;
     }, 400);
   </script>
