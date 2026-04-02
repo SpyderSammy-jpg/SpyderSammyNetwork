@@ -323,6 +323,144 @@
 
 
 
+<!-- ===== NEW ADMIN TABS + POPUPS ===== -->
 
+<style>
+.popup {
+  display:none; position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  background:#000; border:2px solid red;
+  padding:20px; z-index:10010; color:white;
+  width:80%; height:80%;
+}
+
+.close-btn {
+  position:absolute; top:10px; right:15px;
+  cursor:pointer; color:red; font-weight:bold;
+}
+
+#editor {
+  width:100%; height:35%;
+  background:black; color:#0f0; font-family:monospace;
+}
+
+#preview {
+  width:100%; height:45%; border:none;
+  background:white;
+}
+
+#scan-bar {
+  width:100%; height:10px; background:#111; overflow:hidden;
+}
+#scan-fill {
+  width:30%; height:100%; background:red;
+  animation:scan 1s infinite alternate;
+}
+@keyframes scan {
+  from { transform:translateX(0); }
+  to { transform:translateX(200%); }
+}
+</style>
+
+<script>
+/* ===== ADD BUTTONS TO ADMIN MENU ===== */
+(function(){
+  const menu = document.getElementById("admin-menu");
+
+  const tabs = [
+    ["Test","openTest"],
+    ["List","openList"],
+    ["GitHub","openGitHub"],
+    ["Online","openOnline"],
+    ["Scan","openScan"],
+    ["BookMarklets","openBookmark"]
+  ];
+
+  tabs.reverse().forEach(([name,fn])=>{
+    const div = document.createElement("div");
+    div.className = "admin-opt";
+    div.innerText = name;
+    div.onclick = ()=>window[fn]();
+    menu.insertBefore(div, menu.lastElementChild);
+  });
+})();
+
+/* ===== TEST ===== */
+function openTest(){
+  document.getElementById('test-popup').style.display='block';
+  document.getElementById('editor').value=document.documentElement.outerHTML;
+}
+function runPreview(){
+  document.getElementById('preview').srcdoc=document.getElementById('editor').value;
+}
+
+/* ===== LINKS ===== */
+function openList(){
+  window.open("https://docs.google.com/document/d/1stBkKWEtbASCIur9aRl1UJ6qpsU0ykGJzJnK_EGifEY/edit?tab=t.0#heading=h.nj23sjpj5u97","_blank");
+}
+function openGitHub(){
+  window.open("https://github.com/SpyderSammy-jpg/SpyderSammy1","_blank");
+}
+
+/* ===== ONLINE ===== */
+function openOnline(){
+  const num=Math.floor(Math.random()*21)+3;
+  document.getElementById('online-count').innerText="People Online: "+num;
+  document.getElementById('online-popup').style.display='block';
+}
+
+/* ===== SCAN ===== */
+function openScan(){
+  document.getElementById('scan-popup').style.display='block';
+  document.getElementById('scan-text').innerText="Scanning...";
+  setTimeout(()=>{
+    document.getElementById('scan-text').innerText=
+    "Scan complete! This proxy website is safe! No malwares or viruses have been found!";
+  },20000);
+}
+
+/* ===== BOOKMARK ===== */
+function openBookmark(){
+  document.getElementById('bookmark-popup').style.display='block';
+}
+
+function closePopup(id){
+  document.getElementById(id).style.display='none';
+}
+</script>
+
+<!-- ===== POPUPS ===== -->
+
+<div class="popup" id="test-popup">
+  <div class="close-btn" onclick="closePopup('test-popup')">X</div>
+  <h2>Testing Zone</h2>
+  <p>Your changes will not be saved.</p>
+
+  <select>
+    <option>Classic</option>
+    <option>Medium</option>
+    <option>Advanced</option>
+  </select>
+
+  <textarea id="editor"></textarea>
+  <button onclick="runPreview()">Commit Changes</button>
+  <iframe id="preview"></iframe>
+</div>
+
+<div class="popup" id="online-popup">
+  <div class="close-btn" onclick="closePopup('online-popup')">X</div>
+  <h2 id="online-count"></h2>
+</div>
+
+<div class="popup" id="scan-popup">
+  <div class="close-btn" onclick="closePopup('scan-popup')">X</div>
+  <h2 id="scan-text">Scanning...</h2>
+  <div id="scan-bar"><div id="scan-fill"></div></div>
+</div>
+
+<div class="popup" id="bookmark-popup">
+  <div class="close-btn" onclick="closePopup('bookmark-popup')">X</div>
+  <h2>This part is being updated!</h2>
+</div>
 </body>
 </html>
