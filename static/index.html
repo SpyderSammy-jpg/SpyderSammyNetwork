@@ -767,5 +767,268 @@ function runPreview(){
 
   <textarea id="editor"></textarea>
 </div>
+<!-- ================= PROFILE SYSTEM ================= -->
+<style>
+#profile-box {
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:#000;
+  border:2px solid red;
+  padding:10px;
+  width:200px;
+  color:white;
+  z-index:10070;
+}
+
+#profile-img {
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:4px solid white;
+}
+
+#xp-bar {
+  width:100%;
+  height:6px;
+  background:#222;
+  margin-top:5px;
+}
+#xp-fill {
+  height:100%;
+  background:white;
+  width:0%;
+}
+
+#login-screen {
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:20000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+#login-screen input {
+  margin:5px;
+  padding:8px;
+  background:#111;
+  border:1px solid red;
+  color:white;
+}
+
+.popup2 {
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#000;
+  border:2px solid red;
+  padding:20px;
+  z-index:10080;
+  color:white;
+}
+</style>
+
+<div id="login-screen">
+  <h2>Login / Signup</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" placeholder="Password" type="password">
+  <input id="img" placeholder="Image URL (for signup)">
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Signup</button>
+</div>
+
+<div id="profile-box">
+  <img id="profile-img">
+  <div id="profile-name"></div>
+  <div id="profile-role"></div>
+  <div>Level: <span id="level"></span></div>
+  <div id="xp-bar"><div id="xp-fill"></div></div>
+
+  <button onclick="openGoals()">Daily Goals</button>
+  <button onclick="openFeatures()">Features</button>
+</div>
+
+<div class="popup2" id="goals-popup"></div>
+<div class="popup2" id="features-popup"></div>
+
+<script>
+let userData = JSON.parse(localStorage.getItem("userData") || "{}");
+
+function save(){ localStorage.setItem("userData", JSON.stringify(userData)); }
+
+/* LOGIN */
+function login(){
+  const u = user.value;
+  const p = pass.value;
+
+  if((u==="Sharvesh" && p==="00010698") || (u==="Rayhaan" && p==="222")){
+    initAdmin(u);
+    return;
+  }
+
+  if(userData[u] && userData[u].pass===p){
+    localStorage.setItem("currentUser", u);
+    start();
+  }
+}
+
+/* SIGNUP */
+function signup(){
+  const u = user.value;
+  const p = pass.value;
+  const i = img.value;
+
+  if(!u || !p) return;
+
+  userData[u] = {
+    pass:p,
+    img:i || "https://via.placeholder.com/60",
+    xp:0,
+    level:1,
+    features:[]
+  };
+
+  save();
+  localStorage.setItem("currentUser", u);
+  start();
+}
+
+/* ADMIN PRESETS */
+function initAdmin(name){
+  userData[name] = {
+    pass: (name==="Sharvesh")?"00010698":"222",
+    img:"https://via.placeholder.com/60",
+    xp: (name==="Sharvesh")?84:84,
+    level:(name==="Sharvesh")?20:20,
+    features:["Console","Mini Tools","Theme Switch"]
+  };
+
+  save();
+  localStorage.setItem("currentUser", name);
+  start();
+}
+
+/* START */
+function start(){
+  login-screen.style.display="none";
+  updateProfile();
+}
+
+/* PROFILE UI */
+function updateProfile(){
+  const u = localStorage.getItem("currentUser");
+  const d = userData[u];
+
+  profile-img.src = d.img;
+  profile-name.innerText = u;
+
+  let role = "Guest";
+  if(u==="Sharvesh") role="Owner";
+  else if(u==="Rayhaan") role="Co-owner";
+
+  profile-role.innerText = role;
+  level.innerText = d.level;
+
+  const needed = 50 + (d.level-1)*10;
+  xp-fill.style.width = (d.xp/needed*100)+"%";
+}
+
+/* XP SYSTEM */
+function addXP(amount){
+  const u = localStorage.getItem("currentUser");
+  const d = userData[u];
+
+  d.xp += amount;
+
+  let needed = 50 + (d.level-1)*10;
+
+  if(d.xp >= needed){
+    d.xp = d.xp - needed;
+    d.level++;
+    unlockFeature(d);
+    alert("LEVEL UP!");
+  }
+
+  save();
+  updateProfile();
+}
+
+/* FEATURES */
+function unlockFeature(d){
+  const list = [
+    "Console",
+    "Theme Toggle",
+    "Mini Games",
+    "Sound FX",
+    "Quick Links",
+    "XP Boost",
+    "Profile Color",
+    "Hidden Page",
+    "Clock Widget",
+    "Glitch Mode"
+  ];
+
+  const f = list[Math.floor(Math.random()*list.length)];
+  if(!d.features.includes(f)) d.features.push(f);
+}
+
+/* FEATURES POPUP */
+function openFeatures(){
+  const u = localStorage.getItem("currentUser");
+  const d = userData[u];
+
+  let html = "<h3>Features</h3>";
+
+  if(d.features.length===0) html+="None";
+  else d.features.forEach(f=>{
+    html += "<div>"+f+"</div>";
+  });
+
+  features-popup.innerHTML = html + "<br><button onclick='closeP()'>Close</button>";
+  features-popup.style.display="block";
+}
+
+/* DAILY GOALS */
+function openGoals(){
+  const goals = [
+    {text:"Click 20 times",xp:20},
+    {text:"Stay 2 minutes",xp:15},
+    {text:"Open admin menu",xp:25},
+    {text:"Click title 5 times",xp:10},
+    {text:"Use search box",xp:10}
+  ];
+
+  let html="<h3>Daily Goals</h3>";
+
+  goals.forEach(g=>{
+    html += `<div onclick="completeGoal(${g.xp})">${g.text} (+${g.xp}xp)</div>`;
+  });
+
+  goals-popup.innerHTML = html + "<br><button onclick='closeP()'>Close</button>";
+  goals-popup.style.display="block";
+}
+
+function completeGoal(xp){
+  addXP(xp);
+  alert("Goal Complete!");
+}
+
+function closeP(){
+  goals-popup.style.display="none";
+  features-popup.style.display="none";
+}
+
+/* AUTO LOGIN */
+window.addEventListener("load", ()=>{
+  if(localStorage.getItem("currentUser")){
+    start();
+  }
+});
+</script>
 </body>
 </html>
