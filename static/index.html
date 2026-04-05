@@ -767,25 +767,68 @@ function runPreview(){
 
   <textarea id="editor"></textarea>
 </div>
-<!-- ================= PROFILE SYSTEM ================= -->
+<!-- ================= CLEAN LOGIN SYSTEM ================= -->
 <style>
+#auth-screen {
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:20000;
+  font-family:sans-serif;
+}
+
+#auth-box {
+  background:#000;
+  border:2px solid red;
+  padding:30px;
+  text-align:center;
+  color:white;
+  width:280px;
+}
+
+#auth-box h2 {
+  margin-bottom:15px;
+}
+
+#auth-box input {
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  background:#111;
+  border:1px solid red;
+  color:white;
+}
+
+#auth-box button {
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  background:red;
+  border:none;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#guest-btn {
+  background:#222 !important;
+  color:white !important;
+}
+
 #profile-box {
   position:fixed;
   bottom:20px;
   left:20px;
   background:#000;
   border:2px solid red;
-  padding:10px;
+  padding:12px;
   width:200px;
   color:white;
   z-index:10070;
-}
-
-#profile-img {
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  border:4px solid white;
+  display:none;
 }
 
 #xp-bar {
@@ -794,241 +837,155 @@ function runPreview(){
   background:#222;
   margin-top:5px;
 }
+
 #xp-fill {
   height:100%;
   background:white;
   width:0%;
 }
-
-#login-screen {
-  position:fixed;
-  inset:0;
-  background:#000;
-  z-index:20000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
-
-#login-screen input {
-  margin:5px;
-  padding:8px;
-  background:#111;
-  border:1px solid red;
-  color:white;
-}
-
-.popup2 {
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#000;
-  border:2px solid red;
-  padding:20px;
-  z-index:10080;
-  color:white;
-}
 </style>
 
-<div id="login-screen">
-  <h2>Login / Signup</h2>
-  <input id="user" placeholder="Username">
-  <input id="pass" placeholder="Password" type="password">
-  <input id="img" placeholder="Image URL (for signup)">
-  <button onclick="login()">Login</button>
-  <button onclick="signup()">Signup</button>
+<div id="auth-screen">
+  <div id="auth-box">
+    <h2>Account Access</h2>
+    <input id="auth-user" placeholder="Username">
+    <input id="auth-pass" type="password" placeholder="Password">
+
+    <button onclick="loginUser()">Login</button>
+    <button onclick="signupUser()">Create Account</button>
+    <button id="guest-btn" onclick="continueGuest()">Continue without account</button>
+  </div>
 </div>
 
 <div id="profile-box">
-  <img id="profile-img">
-  <div id="profile-name"></div>
-  <div id="profile-role"></div>
-  <div>Level: <span id="level"></span></div>
+  <div id="p-name"></div>
+  <div id="p-role"></div>
+  <div>Level: <span id="p-level"></span></div>
   <div id="xp-bar"><div id="xp-fill"></div></div>
-
-  <button onclick="openGoals()">Daily Goals</button>
-  <button onclick="openFeatures()">Features</button>
 </div>
 
-<div class="popup2" id="goals-popup"></div>
-<div class="popup2" id="features-popup"></div>
-
 <script>
-let userData = JSON.parse(localStorage.getItem("userData") || "{}");
+/* ===== STORAGE ===== */
+let users = JSON.parse(localStorage.getItem("users") || "{}");
 
-function save(){ localStorage.setItem("userData", JSON.stringify(userData)); }
+/* PRELOAD ADMINS */
+if(!users["Sharvesh"]){
+  users["Sharvesh"] = {
+    pass:"00010698",
+    xp:84,
+    level:20,
+    role:"Owner"
+  };
+}
+if(!users["Rayhaan"]){
+  users["Rayhaan"] = {
+    pass:"222",
+    xp:84,
+    level:20,
+    role:"Co-owner"
+  };
+}
+
+saveUsers();
+
+function saveUsers(){
+  localStorage.setItem("users", JSON.stringify(users));
+}
 
 /* LOGIN */
-function login(){
-  const u = user.value;
-  const p = pass.value;
+function loginUser(){
+  const u = document.getElementById("auth-user").value;
+  const p = document.getElementById("auth-pass").value;
 
-  if((u==="Sharvesh" && p==="00010698") || (u==="Rayhaan" && p==="222")){
-    initAdmin(u);
-    return;
-  }
-
-  if(userData[u] && userData[u].pass===p){
+  if(users[u] && users[u].pass === p){
     localStorage.setItem("currentUser", u);
-    start();
+    startUser();
+  } else {
+    alert("Invalid login.");
   }
 }
 
 /* SIGNUP */
-function signup(){
-  const u = user.value;
-  const p = pass.value;
-  const i = img.value;
+function signupUser(){
+  const u = document.getElementById("auth-user").value;
+  const p = document.getElementById("auth-pass").value;
 
-  if(!u || !p) return;
+  if(!u || !p){
+    alert("Enter username and password.");
+    return;
+  }
 
-  userData[u] = {
+  if(users[u]){
+    alert("User already exists.");
+    return;
+  }
+
+  users[u] = {
     pass:p,
-    img:i || "https://via.placeholder.com/60",
     xp:0,
     level:1,
-    features:[]
+    role:"Guest"
   };
 
-  save();
+  saveUsers();
   localStorage.setItem("currentUser", u);
-  start();
+  startUser();
 }
 
-/* ADMIN PRESETS */
-function initAdmin(name){
-  userData[name] = {
-    pass: (name==="Sharvesh")?"00010698":"222",
-    img:"https://via.placeholder.com/60",
-    xp: (name==="Sharvesh")?84:84,
-    level:(name==="Sharvesh")?20:20,
-    features:["Console","Mini Tools","Theme Switch"]
-  };
-
-  save();
-  localStorage.setItem("currentUser", name);
-  start();
+/* GUEST MODE */
+function continueGuest(){
+  localStorage.setItem("guest", "true");
+  document.getElementById("auth-screen").style.display = "none";
 }
 
-/* START */
-function start(){
-  login-screen.style.display="none";
+/* START USER */
+function startUser(){
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("profile-box").style.display = "block";
   updateProfile();
 }
 
-/* PROFILE UI */
+/* PROFILE UPDATE */
 function updateProfile(){
   const u = localStorage.getItem("currentUser");
-  const d = userData[u];
+  const d = users[u];
 
-  profile-img.src = d.img;
-  profile-name.innerText = u;
-
-  let role = "Guest";
-  if(u==="Sharvesh") role="Owner";
-  else if(u==="Rayhaan") role="Co-owner";
-
-  profile-role.innerText = role;
-  level.innerText = d.level;
+  document.getElementById("p-name").innerText = u;
+  document.getElementById("p-role").innerText = d.role;
+  document.getElementById("p-level").innerText = d.level;
 
   const needed = 50 + (d.level-1)*10;
-  xp-fill.style.width = (d.xp/needed*100)+"%";
+  document.getElementById("xp-fill").style.width = (d.xp/needed*100)+"%";
 }
 
 /* XP SYSTEM */
-function addXP(amount){
+function addXP(x){
   const u = localStorage.getItem("currentUser");
-  const d = userData[u];
+  if(!u) return;
 
-  d.xp += amount;
+  const d = users[u];
+  d.xp += x;
 
   let needed = 50 + (d.level-1)*10;
 
   if(d.xp >= needed){
-    d.xp = d.xp - needed;
+    d.xp -= needed;
     d.level++;
-    unlockFeature(d);
-    alert("LEVEL UP!");
+    alert("Level Up!");
   }
 
-  save();
+  saveUsers();
   updateProfile();
 }
 
-/* FEATURES */
-function unlockFeature(d){
-  const list = [
-    "Console",
-    "Theme Toggle",
-    "Mini Games",
-    "Sound FX",
-    "Quick Links",
-    "XP Boost",
-    "Profile Color",
-    "Hidden Page",
-    "Clock Widget",
-    "Glitch Mode"
-  ];
-
-  const f = list[Math.floor(Math.random()*list.length)];
-  if(!d.features.includes(f)) d.features.push(f);
-}
-
-/* FEATURES POPUP */
-function openFeatures(){
-  const u = localStorage.getItem("currentUser");
-  const d = userData[u];
-
-  let html = "<h3>Features</h3>";
-
-  if(d.features.length===0) html+="None";
-  else d.features.forEach(f=>{
-    html += "<div>"+f+"</div>";
-  });
-
-  features-popup.innerHTML = html + "<br><button onclick='closeP()'>Close</button>";
-  features-popup.style.display="block";
-}
-
-/* DAILY GOALS */
-function openGoals(){
-  const goals = [
-    {text:"Click 20 times",xp:20},
-    {text:"Stay 2 minutes",xp:15},
-    {text:"Open admin menu",xp:25},
-    {text:"Click title 5 times",xp:10},
-    {text:"Use search box",xp:10}
-  ];
-
-  let html="<h3>Daily Goals</h3>";
-
-  goals.forEach(g=>{
-    html += `<div onclick="completeGoal(${g.xp})">${g.text} (+${g.xp}xp)</div>`;
-  });
-
-  goals-popup.innerHTML = html + "<br><button onclick='closeP()'>Close</button>";
-  goals-popup.style.display="block";
-}
-
-function completeGoal(xp){
-  addXP(xp);
-  alert("Goal Complete!");
-}
-
-function closeP(){
-  goals-popup.style.display="none";
-  features-popup.style.display="none";
-}
-
 /* AUTO LOGIN */
-window.addEventListener("load", ()=>{
+window.onload = function(){
   if(localStorage.getItem("currentUser")){
-    start();
+    startUser();
+  } else if(localStorage.getItem("guest")){
+    document.getElementById("auth-screen").style.display = "none";
   }
-});
+};
 </script>
 </body>
 </html>
