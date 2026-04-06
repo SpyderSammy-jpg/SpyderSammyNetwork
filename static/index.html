@@ -987,5 +987,235 @@ window.onload = function(){
   }
 };
 </script>
+<!-- ===== XP SYSTEM UPGRADE ===== -->
+<style>
+#profile-box{
+  bottom:60px !important;
+  width:230px;
+  border-radius:10px;
+}
+
+/* PROFILE IMAGE + RING */
+#p-img-wrap{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:4px solid #222;
+  position:relative;
+  margin-bottom:8px;
+}
+
+#p-img{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:url('https://cdn-icons-png.flaticon.com/512/3135/3135715.png') center/cover;
+}
+
+/* XP RING EFFECT */
+#xp-ring{
+  position:absolute;
+  inset:-4px;
+  border-radius:50%;
+  border:4px solid white;
+  clip-path: polygon(0 0, var(--percent) 0, var(--percent) 100%, 0 100%);
+}
+
+/* BUTTONS */
+.profile-btn{
+  margin-top:6px;
+  padding:6px;
+  font-size:12px;
+  border:none;
+  cursor:pointer;
+  width:100%;
+  font-weight:bold;
+}
+
+#goals-btn{ background:red; color:black; }
+#features-btn{ background:gold; color:black; }
+
+/* POPUP */
+#goals-popup, #features-popup{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#000;
+  border:2px solid red;
+  padding:20px;
+  z-index:20000;
+  width:300px;
+  color:white;
+}
+.goal{
+  border:1px solid #333;
+  padding:8px;
+  margin:6px 0;
+}
+</style>
+
+<!-- PROFILE UI -->
+<div id="goals-popup">
+  <h3>Daily Goals</h3>
+  <div id="goals-list"></div>
+  <button onclick="closeGoals()">Close</button>
+</div>
+
+<div id="features-popup">
+  <h3>Unlocked Features</h3>
+  <div id="features-list"></div>
+  <button onclick="closeFeatures()">Close</button>
+</div>
+
+<script>
+/* ===== FIX ADMIN LEVELS ===== */
+users["Sharvesh"].level = 30;
+users["Sharvesh"].xp = 22;
+users["Rayhaan"].level = 20;
+
+/* ===== PROFILE EXTENSION ===== */
+const box = document.getElementById("profile-box");
+box.innerHTML = `
+  <div id="p-img-wrap">
+    <div id="xp-ring"></div>
+    <div id="p-img"></div>
+  </div>
+
+  <div id="p-name"></div>
+  <div id="p-role"></div>
+  <div>Level: <span id="p-level"></span></div>
+
+  <div id="xp-bar"><div id="xp-fill"></div></div>
+
+  <button id="goals-btn" class="profile-btn" onclick="openGoals()">Daily Tasks</button>
+  <button id="features-btn" class="profile-btn" onclick="openFeatures()">Rewards</button>
+`;
+
+/* ===== UPDATE PROFILE ===== */
+function updateProfile(){
+  const u = localStorage.getItem("currentUser");
+  if(!u) return;
+
+  const d = users[u];
+
+  document.getElementById("p-name").innerText = u;
+  document.getElementById("p-role").innerText = d.role;
+  document.getElementById("p-level").innerText = d.level;
+
+  const needed = 50 + (d.level-1)*10;
+  const percent = Math.min((d.xp/needed)*100,100);
+
+  document.getElementById("xp-fill").style.width = percent+"%";
+  document.getElementById("xp-ring").style.setProperty("--percent", percent+"%");
+}
+
+/* ===== HARD DAILY GOALS ===== */
+let goals = [];
+
+function generateGoals(){
+  goals = [
+    {text:"Click 100,000 times", need:100000, prog:0, xp:200},
+    {text:"Stay 30 minutes", need:1800, prog:0, xp:150},
+    {text:"Open 200 tabs", need:200, prog:0, xp:120},
+    {text:"Type 5000 characters", need:5000, prog:0, xp:180},
+    {text:"Move mouse 10,000px", need:10000, prog:0, xp:160}
+  ];
+}
+
+generateGoals();
+
+/* ===== TRACKING ===== */
+document.addEventListener("click",()=>{
+  goals[0].prog++;
+  checkGoals();
+});
+
+let seconds=0;
+setInterval(()=>{
+  seconds++;
+  goals[1].prog = seconds;
+  checkGoals();
+},1000);
+
+document.addEventListener("keydown",(e)=>{
+  goals[3].prog += e.key.length;
+  checkGoals();
+});
+
+document.addEventListener("mousemove",(e)=>{
+  goals[4].prog += 5;
+  checkGoals();
+});
+
+/* ===== CHECK GOALS ===== */
+function checkGoals(){
+  goals.forEach(g=>{
+    if(!g.done && g.prog >= g.need){
+      g.done = true;
+      addXP(g.xp);
+      alert("Goal Complete: "+g.text+" +"+g.xp+"XP");
+    }
+  });
+}
+
+/* ===== UI ===== */
+function openGoals(){
+  const list = document.getElementById("goals-list");
+  list.innerHTML = "";
+
+  goals.forEach(g=>{
+    list.innerHTML += `
+      <div class="goal">
+        ${g.text}<br>
+        ${g.prog}/${g.need} (${g.xp} XP)
+      </div>
+    `;
+  });
+
+  document.getElementById("goals-popup").style.display="block";
+}
+
+function closeGoals(){
+  document.getElementById("goals-popup").style.display="none";
+}
+
+/* ===== FEATURES ===== */
+const featureList = [
+  "Console Access",
+  "Mini Theme Switch",
+  "Custom Title",
+  "Secret Click Effect",
+  "Extra XP Boost",
+  "Hidden Button",
+  "Background Glow",
+  "Fast Reload",
+  "Sound Toggle",
+  "Advanced Mode"
+];
+
+function openFeatures(){
+  const u = localStorage.getItem("currentUser");
+  const lvl = users[u].level;
+
+  const list = document.getElementById("features-list");
+  list.innerHTML = "";
+
+  if(lvl === 1){
+    list.innerHTML = "None";
+  } else {
+    for(let i=1;i<=lvl && i<=featureList.length;i++){
+      list.innerHTML += "<div class='goal'>"+featureList[i-1]+"</div>";
+    }
+  }
+
+  document.getElementById("features-popup").style.display="block";
+}
+
+function closeFeatures(){
+  document.getElementById("features-popup").style.display="none";
+}
+</script>
 </body>
 </html>
