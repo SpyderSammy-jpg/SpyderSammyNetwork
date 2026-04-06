@@ -1217,5 +1217,290 @@ function closeFeatures(){
   document.getElementById("features-popup").style.display="none";
 }
 </script>
+<!-- ===== FINAL VISUAL + DAILY SYSTEM PATCH ===== -->
+<style>
+/* TOP XP BAR (like your image) */
+#top-xp-bar{
+  position:fixed;
+  top:10px;
+  left:10px;
+  width:180px;
+  background:#111;
+  border-radius:6px;
+  padding:6px;
+  color:white;
+  font-size:12px;
+  z-index:10080;
+}
+#top-xp-fill{
+  height:6px;
+  background:white;
+  margin-top:4px;
+  width:0%;
+}
+
+/* PROFILE STYLE EXACT */
+#profile-box{
+  bottom:70px !important;
+  width:220px;
+  background:#111;
+  border-radius:8px;
+  border:1px solid #333;
+  font-family:sans-serif;
+}
+
+/* PROFILE IMAGE */
+#p-img{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background-size:cover;
+  background-position:center;
+}
+
+/* BUTTONS */
+.profile-btn{
+  display:inline-block;
+  margin-top:5px;
+  padding:5px 8px;
+  font-size:11px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  border-radius:4px;
+}
+#goals-btn{ background:#ff3c00; color:black; }
+#features-btn{ background:#d4af37; color:black; }
+
+/* GOALS UI (MATCH STYLE) */
+#goals-popup{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#1e4d7a;
+  border-radius:15px;
+  padding:20px;
+  width:420px;
+  z-index:30000;
+  color:white;
+}
+
+.goal-card{
+  background:#cfe2f3;
+  color:black;
+  padding:10px;
+  border-radius:10px;
+  margin:8px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* FEATURES */
+#features-popup{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#000;
+  border:2px solid red;
+  padding:20px;
+  z-index:30000;
+  color:white;
+  width:300px;
+}
+.feature-item{
+  border:1px solid #333;
+  padding:8px;
+  margin:6px 0;
+  cursor:pointer;
+}
+</style>
+
+<!-- TOP BAR -->
+<div id="top-xp-bar">
+  <div>LEVEL <span id="top-level"></span></div>
+  <div id="top-xp-fill"></div>
+  <div id="top-xp-text"></div>
+</div>
+
+<!-- GOALS -->
+<div id="goals-popup">
+  <h2 style="text-align:center;">GOALS</h2>
+  <div id="goals-list"></div>
+  <button onclick="closeGoals()">Close</button>
+</div>
+
+<!-- FEATURES -->
+<div id="features-popup">
+  <h3>Rewards</h3>
+  <div id="features-list"></div>
+  <button onclick="closeFeatures()">Close</button>
+</div>
+
+<script>
+/* ===== SHARVESH IMAGE ONLY ===== */
+const SHARVESH_IMG = "https://i.imgur.com/yourImage.png"; // replace with your image
+
+/* ===== LEVEL SYSTEM ===== */
+function getXPNeeded(level){
+  return 50 + (level-1)*10;
+}
+
+/* ===== DAILY GOALS SYSTEM ===== */
+function getTodayKey(){
+  return "goals_"+new Date().toDateString();
+}
+
+function generateDailyGoals(){
+  return [
+    {text:"Click 100,000 times", need:100000, xp:300},
+    {text:"Stay online 45 minutes", need:2700, xp:250},
+    {text:"Press 8000 keys", need:8000, xp:280},
+    {text:"Move mouse 20000px", need:20000, xp:260},
+    {text:"Open 300 tabs", need:300, xp:320}
+  ];
+}
+
+let goalsData = JSON.parse(localStorage.getItem(getTodayKey()) || "null");
+
+if(!goalsData){
+  goalsData = generateDailyGoals().map(g=>({...g, prog:0, done:false}));
+  localStorage.setItem(getTodayKey(), JSON.stringify(goalsData));
+}
+
+/* ===== TRACKING ===== */
+document.addEventListener("click",()=>{ goalsData[0].prog++; saveGoals(); });
+document.addEventListener("keydown",(e)=>{ goalsData[2].prog += e.key.length; saveGoals(); });
+document.addEventListener("mousemove",()=>{ goalsData[3].prog+=5; saveGoals(); });
+
+setInterval(()=>{
+  goalsData[1].prog++;
+  saveGoals();
+},1000);
+
+function saveGoals(){
+  localStorage.setItem(getTodayKey(), JSON.stringify(goalsData));
+  checkGoals();
+}
+
+/* ===== CHECK GOALS ===== */
+function checkGoals(){
+  const u = localStorage.getItem("currentUser");
+  if(!u) return;
+
+  goalsData.forEach(g=>{
+    if(!g.done && g.prog>=g.need){
+      g.done=true;
+      users[u].xp += g.xp;
+      levelCheck(u);
+    }
+  });
+
+  saveUsers();
+  updateProfile();
+}
+
+/* ===== LEVEL UP ===== */
+function levelCheck(u){
+  let d = users[u];
+  let needed = getXPNeeded(d.level);
+
+  while(d.xp >= needed && d.level < 30){
+    d.xp -= needed;
+    d.level++;
+    alert("LEVEL UP!");
+    needed = getXPNeeded(d.level);
+  }
+}
+
+/* ===== UPDATE PROFILE (FULL OVERRIDE) ===== */
+updateProfile = function(){
+  const u = localStorage.getItem("currentUser");
+  if(!u) return;
+
+  const d = users[u];
+  const needed = getXPNeeded(d.level);
+  const percent = (d.xp/needed)*100;
+
+  document.getElementById("p-name").innerText = u;
+  document.getElementById("p-role").innerText = d.role;
+  document.getElementById("p-level").innerText = d.level;
+
+  document.getElementById("xp-fill").style.width = percent+"%";
+
+  /* TOP BAR */
+  document.getElementById("top-level").innerText = d.level;
+  document.getElementById("top-xp-fill").style.width = percent+"%";
+  document.getElementById("top-xp-text").innerText =
+    d.xp + "/" + needed + " XP";
+
+  /* SHARVESH IMAGE ONLY */
+  const img = document.getElementById("p-img");
+  if(u === "Sharvesh"){
+    img.style.backgroundImage = "url('"+SHARVESH_IMG+"')";
+  }
+
+};
+
+/* ===== GOALS UI ===== */
+function openGoals(){
+  const list = document.getElementById("goals-list");
+  list.innerHTML="";
+
+  goalsData.forEach(g=>{
+    list.innerHTML += `
+      <div class="goal-card">
+        <div>${g.text}<br>(${g.prog}/${g.need})</div>
+        <div>${g.xp} XP</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("goals-popup").style.display="block";
+}
+function closeGoals(){ document.getElementById("goals-popup").style.display="none"; }
+
+/* ===== FEATURES PER LEVEL ===== */
+const features = [
+  "Console","Mini Theme","Custom Title","Click Effect","XP Boost",
+  "Hidden Button","Glow UI","Quick Reload","Sound Toggle","Advanced Mode",
+  "Secret Tab","Color Shift","Mini Game","Speed Boost","Extra Slot",
+  "Auto Click","Background Music","Extra Theme","Hover FX","Dark Glow",
+  "Custom Cursor","Quick Open","Macro Lite","Tab Saver","Mini Stats",
+  "Boost 2x","Unlock Scan","Mini Admin","Power Mode","Elite Mode"
+];
+
+function openFeatures(){
+  const u = localStorage.getItem("currentUser");
+  const lvl = users[u].level;
+
+  const list = document.getElementById("features-list");
+  list.innerHTML="";
+
+  for(let i=0;i<lvl;i++){
+    list.innerHTML += `
+      <div class="feature-item" onclick="useFeature('${features[i]}')">
+        ${features[i]}
+      </div>
+    `;
+  }
+
+  document.getElementById("features-popup").style.display="block";
+}
+
+function closeFeatures(){
+  document.getElementById("features-popup").style.display="none";
+}
+
+/* FEATURE ACTION */
+function useFeature(f){
+  if(f==="Console") toggleConsole();
+  else alert(f+" activated");
+}
+</script>
 </body>
 </html>
