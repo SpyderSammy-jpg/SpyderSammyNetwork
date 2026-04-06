@@ -1502,5 +1502,244 @@ function useFeature(f){
   else alert(f+" activated");
 }
 </script>
+<!-- ===== FINAL VISUAL FIX PATCH ===== -->
+<style>
+/* SMALL PROFILE (MATCH IMAGE) */
+#profile-box{
+  bottom:50px !important;
+  left:15px;
+  width:190px;
+  padding:10px;
+  background:#111;
+  border:1px solid #222;
+  border-radius:8px;
+  font-size:12px;
+}
+
+/* PROFILE IMAGE */
+#p-img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:url('https://i.imgur.com/8Km9tLL.png') center/cover no-repeat;
+  margin-bottom:5px;
+}
+
+/* BUTTON ROW */
+.profile-btn{
+  font-size:10px;
+  padding:4px;
+  margin-top:4px;
+}
+
+/* FEATURES GRID 5x6 */
+#features-list{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+}
+
+.feature-item{
+  font-size:10px;
+  padding:6px;
+  text-align:center;
+  border:1px solid #333;
+  cursor:pointer;
+  background:#111;
+}
+.feature-item:hover{
+  background:red;
+  color:black;
+}
+</style>
+
+<script>
+/* ===== FORCE SHARVESH IMAGE ===== */
+const originalUpdate = updateProfile;
+updateProfile = function(){
+  originalUpdate();
+
+  const u = localStorage.getItem("currentUser");
+  if(!u) return;
+
+  if(u === "Sharvesh"){
+    document.getElementById("p-img").style.backgroundImage =
+      "url('https://i.imgur.com/8Km9tLL.png')";
+  }
+};
+
+/* ===== FEATURES GRID (5x6 EXACT) ===== */
+function openFeatures(){
+  const u = localStorage.getItem("currentUser");
+  const lvl = users[u].level;
+
+  const list = document.getElementById("features-list");
+  list.innerHTML="";
+
+  for(let i=0;i<30;i++){
+    if(i < lvl){
+      list.innerHTML += `
+        <div class="feature-item" onclick="useFeature(${i})">
+          ${features[i]}
+        </div>
+      `;
+    } else {
+      list.innerHTML += `
+        <div class="feature-item" style="opacity:0.2;">
+          Locked
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById("features-popup").style.display="block";
+}
+
+/* ===== REAL FEATURE ACTIONS ===== */
+function useFeature(i){
+  const f = features[i];
+
+  switch(f){
+
+    case "Console":
+      toggleConsole();
+      break;
+
+    case "Mini Theme":
+      document.body.style.background = "#111";
+      break;
+
+    case "Custom Title":
+      document.title = "Upgraded Mode";
+      break;
+
+    case "Click Effect":
+      document.addEventListener("click", e=>{
+        const dot = document.createElement("div");
+        dot.style.position="fixed";
+        dot.style.left=e.clientX+"px";
+        dot.style.top=e.clientY+"px";
+        dot.style.width="5px";
+        dot.style.height="5px";
+        dot.style.background="red";
+        document.body.appendChild(dot);
+        setTimeout(()=>dot.remove(),500);
+      });
+      break;
+
+    case "XP Boost":
+      addXP(50);
+      break;
+
+    case "Hidden Button":
+      const b = document.createElement("button");
+      b.innerText="Secret";
+      b.style.position="fixed";
+      b.style.top="50%";
+      b.style.left="50%";
+      b.onclick=()=>addXP(100);
+      document.body.appendChild(b);
+      break;
+
+    case "Glow UI":
+      document.body.style.boxShadow="0 0 20px red inset";
+      break;
+
+    case "Quick Reload":
+      location.reload();
+      break;
+
+    case "Sound Toggle":
+      alert("Sound feature placeholder");
+      break;
+
+    case "Advanced Mode":
+      document.body.style.filter="contrast(120%)";
+      break;
+
+    case "Secret Tab":
+      window.open("about:blank");
+      break;
+
+    case "Color Shift":
+      document.body.style.filter="hue-rotate(90deg)";
+      break;
+
+    case "Mini Game":
+      alert("Mini game coming soon");
+      break;
+
+    case "Speed Boost":
+      document.body.style.transition="0.1s";
+      break;
+
+    case "Extra Slot":
+      alert("Extra slot unlocked");
+      break;
+
+    case "Auto Click":
+      setInterval(()=>document.body.click(),1000);
+      break;
+
+    case "Background Music":
+      new Audio().play();
+      break;
+
+    case "Extra Theme":
+      document.body.style.background="#001";
+      break;
+
+    case "Hover FX":
+      document.body.style.cursor="pointer";
+      break;
+
+    case "Dark Glow":
+      document.body.style.background="#000";
+      break;
+
+    case "Custom Cursor":
+      document.body.style.cursor="crosshair";
+      break;
+
+    case "Quick Open":
+      window.open("https://google.com");
+      break;
+
+    case "Macro Lite":
+      alert("Macro enabled");
+      break;
+
+    case "Tab Saver":
+      localStorage.setItem("saved","true");
+      break;
+
+    case "Mini Stats":
+      alert("Stats coming soon");
+      break;
+
+    case "Boost 2x":
+      addXP(100);
+      break;
+
+    case "Unlock Scan":
+      openScan();
+      break;
+
+    case "Mini Admin":
+      toggleAdminMenu();
+      break;
+
+    case "Power Mode":
+      document.body.style.zoom="110%";
+      break;
+
+    case "Elite Mode":
+      document.body.style.background="black";
+      document.body.style.color="red";
+      break;
+
+  }
+}
+</script>
 </body>
 </html>
