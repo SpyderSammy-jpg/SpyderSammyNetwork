@@ -76,6 +76,17 @@
     gtag("config", "G-WKJQ5QHQTJ");
   </script>
   <!-- DO NOT REMOVE-->
+<script>
+// Auto-fill the tabs search bar from URL
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('#input'); // tabs page search bar
+    const query = new URLSearchParams(window.location.search).get('search');
+    if (searchInput && query) {
+        searchInput.value = query;
+        searchInput.dispatchEvent(new Event('input')); // optional: triggers any search listener
+    }
+});
+</script>
 </body>
 
 </html>
