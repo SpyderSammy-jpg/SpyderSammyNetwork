@@ -157,6 +157,85 @@
 
   <!-- AI PLATFORM -->
   <!-- :contentReference[oaicite:0]{index=0} -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
 
+<div class="elfsight-app-58e557d5-231c-43da-b17c-7f1d9afa1010" data-elfsight-app-lazy></div>
+<div id="spyderchat-container" style="display:none; position:fixed; bottom:80px; left:20px; z-index:9999; width:350px; height:500px; background:#000; border:2px solid #ff0000; border-radius:10px; overflow:hidden;">
+    <div style="background:#ff0000; color:#000; padding:5px 10px; font-weight:bold; display:flex; justify-content:space-between; cursor:move;" id="spyderchat-header">
+        <span>SpyderChat</span>
+        <span onclick="toggleSpyderChat()" style="cursor:pointer;">✖</span>
+    </div>
+    <div class="elfsight-app-ce3afc04-a68f-4b2d-bb7a-d1c010d4b90d" data-elfsight-app-lazy></div>
+</div>
+
+<script>
+    // 1. Function to toggle the SpyderChat Popup
+    function toggleSpyderChat() {
+        const chat = document.getElementById('spyderchat-container');
+        chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'block' : 'none';
+    }
+
+    // 2. Inject SpyderChat into your existing Tools Dropdown
+    function injectSpyderTool() {
+        // We look for your tools dropdown menu. 
+        // NOTE: Adjust '.dropdown-content' or '.tools-menu' to match your actual CSS class
+        const toolsMenu = document.querySelector('.dropdown-content') || document.querySelector('.tools-menu');
+        
+        if (toolsMenu) {
+            const chatBtn = document.createElement('div');
+            chatBtn.className = 'admin-opt'; // Using your existing style
+            chatBtn.innerHTML = 'SpyderChat';
+            chatBtn.onclick = toggleSpyderChat;
+            toolsMenu.appendChild(chatBtn);
+        }
+    }
+
+    // Run injection when page loads
+    window.addEventListener('DOMContentLoaded', injectSpyderTool);
+
+    // 3. Make the SpyderChat Window Draggable
+    dragElement(document.getElementById("spyderchat-container"));
+
+    function dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        if (document.getElementById(elmnt.id + "header")) {
+            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        }
+        function dragMouseDown(e) {
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            elmnt.style.bottom = "auto"; // Override the initial bottom positioning
+        }
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+</script>
+
+<style>
+    /* Ensures the tools and widgets stay on top of everything */
+    #spyderchat-container, .elfsight-app-58e557d5-231c-43da-b17c-7f1d9afa1010 {
+        z-index: 10000 !important;
+    }
+    
+    /* Make sure the tools icon itself is fixed if it isn't already */
+    .tools-icon-container { 
+        position: fixed; 
+        z-index: 10001;
+    }
+</style>
 </body>
 </html>
